@@ -1,0 +1,22 @@
+.filtros{
+    position: relative;
+    float:right;
+    width:17.5%; 
+    top: 0px;
+    bottom: 0px;
+    shape-outside: content-box;
+}
+.scale-svg
+{
+    width: 100%;
+    height: 100%;
+}
+.scale-svg-vertical
+{
+    width: 75%;
+    height: 75%;
+}
+.rotate-svg
+{
+    transform: rotate(90deg);
+}

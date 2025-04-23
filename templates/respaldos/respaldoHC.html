@@ -1,0 +1,1642 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load get_tamizado %}
+{% load get_defectos %}
+{% load get_sabores_aromas %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/homeAnalisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0 "></script>
+<script>
+    let info={};
+    {% for m in muestras %}
+        {% for s in sensoriales %}
+          {% if s.fkMuestra.idMuestra == m.idMuestra %}
+          info[{{m.idMuestra}}] = { Fragancia: '{{s.fragancia}}' , Sabor: '{{s.pSabor}}' , Acidez: '{{s.acidez}}' , Cuerpo: '{{s.cuerpo}}' , Remanente: '{{s.remanente}}' , Uniformidad: '{{s.pUniformidad}}' , Balance: '{{s.balance}}' , TazaLimpia: '{{s.pTLimpia}}' , Dulzor: '{{s.pDulzor}}' , Catador: '{{s.pCatador}}' };
+          {% endif %}
+        {% endfor %}
+    {% endfor %}
+</script>
+<script src="{% static '/scripts/verResultados.js' %}" ></script>
+{% endblock %}
+
+{% block title %}
+    : Perfil de Resultados
+{% endblock %}
+
+{% block main %}
+<div class="container py-5 ps-sm-5">
+  <div class="row mb-3 ">
+    <div class="col-6 text-start">
+        <h3>Perfil de Resultados</h3>
+    </div>
+  </div>
+  <div class="card border-0 shadow-none ms-5">
+    <ul class="nav nav-tabs mb-3" id="muestras" role="tablist">
+      {% for m in muestras %}
+        {% if forloop.first %}
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active" id="muestra-{{m.idMuestra}}" data-mdb-toggle="tab" href="#muestras-{{m.idMuestra}}" role="tab" aria-controls="muestras-{{m.idMuestra}}" aria-selected="true">Muestra {{m.idMuestra}}</a>
+        </li>
+        {% else %}
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="muestra-{{m.idMuestra}}" data-mdb-toggle="tab" href="#muestras-{{m.idMuestra}}" role="tab" aria-controls="muestras-{{m.idMuestra}}" aria-selected="false">Muestra {{m.idMuestra}}</a>
+        </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    <div class="tab-content" id="muestras-content">
+      {% for m in muestras %}
+        {% if forloop.first %}
+          <div class="tab-pane fade show active" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+            <div class="row h-auto justify-content-center align-items-center mb-5">
+              <div class="col-6"> 
+                <canvas id="polar-{{m.idMuestra}}">
+                  
+                </canvas>
+              </div>
+            </div>
+           
+            {% for f in fisicos %}
+              {% if f.fkMuestra.idMuestra == m.idMuestra %}
+                <input type="hidden" name="peso-{{m.idMuestra}}" value="{{m.peso}}" id="peso-{{m.idMuestra}}">
+                <div class="card border-0 shadow-none">
+                  <div class="card-header">
+                    <div class="row">
+                        <div class="col-2 text-center">
+                            <b>Muestra: {{ m.idMuestra }}</b>
+                        </div>
+                        <div class="col-5" >
+                          <b>Peso total de granos con defectos: </b>
+                          <input class="w-25" type="number" name="pDefectos" id="pDefectos-{{m.idMuestra}}"  step="0.01" min=0 value="{{f.pDefectos|floatformat:-2}}" readonly>
+                        </div>
+                        <div class="col-5" >
+                            <p><b>Porcentaje de granos con defecto: </b><span id="por-{{m.idMuestra}}" class="porDefecto"></span>{{f.porDefectos|floatformat:-2}}%</p>
+                            <input type="hidden" name="porDefectos" id="POR_D_{{m.idMuestra}}" value="0"  >
+                        </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="container-fluid">
+                      <!-- Tabs navs -->
+                        <ul class="nav nav-tabs mb-3" id="fisico-{{m.idMuestra}}" role="tablist">
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="tamiz-{{m.idMuestra}}" data-mdb-toggle="tab" href="#tamizados-{{m.idMuestra}}" role="tab" aria-controls="tamizados-{{m.idMuestra}}" aria-selected="true">TAMIZADO</a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="defectos1-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto1-{{m.idMuestra}}" role="tab" aria-controls="defecto1-{{m.idMuestra}}" aria-selected="false">DEFECTOS 1</a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="defectos2-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto2-{{m.idMuestra}}" role="tab" aria-controls="defecto2-{{m.idMuestra}}" aria-selected="false">DEFECTOS 2</a>
+                          </li>
+                        </ul>
+                  
+                        <!-- Tabs content -->
+                        <div class="tab-content" id="fisico-{{m.idMuestra}}-content">
+                          <div class="tab-pane fade show active" id="tamizados-{{m.idMuestra}}" role="tabpanel" aria-labelledby="tamiz-{{m.idMuestra}}">
+                            <table class="table table-striped">
+                              <td scope="row">
+                                <td>Humedad</td>
+                                <td>
+                                  <input class="w-25" type="number" name="PORhumedad" id="PORhumedad_{{m.idMuestra}}"  step="0.01" min="0" value="{{f.humedad}}" readonly>
+                                </td>
+                                <td>Temperatura del Analisis</td>
+                                <td>
+                                  <input class="w-25" type="number" name="temp" id="temp_{{m.idMuestra}}"  step="0.01" min="0" value="{{f.temp}}" readonly>
+                                </td>
+                              </td>
+                            </table>
+                            <table class="table table-striped">
+                              <thead>
+                                <tr>
+                                  <th scope="col">Determinación de Tamaños</th>
+                                  <th scope="col">300g</th>
+                                  <th scope="col">% de Retención = PCix / PM * 100</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>Criba 20</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC20" id="PC20_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC20' }}" readonly>
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC20" id="POR_PC20_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC20' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 19</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC19" id="PC19_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC19' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC19" id="POR_PC19_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC19' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 18</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC18" id="PC18_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC18' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC18" id="POR_PC18_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC18' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 17</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC17" id="PC17_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC17' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC17" id="POR_PC17_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC17' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 16</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC16" id="PC16_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC16' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC16" id="POR_PC16_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC16' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 15</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC15" id="PC15_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC15' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC15" id="POR_PC15_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC15' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 14</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC14" id="PC14_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC14' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC14" id="POR_PC14_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC14' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Debajo de Criba 14</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC-14" id="PC-14_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC-14' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC-14" id="POR_PC-14_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC-14' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>TOTAL</td>
+                                  <td>
+                                    <input class="w-25" type="number" name="PCtotal" id="PCtotal_{{m.idMuestra}}"  step="0.01" min="0" value="{{f.pesoTotalTamiz}}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="PORtotal" id="PORtotal_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{f.porTotalTamiz}}">
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="tab-pane fade" id="defecto1-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos1-{{m.idMuestra}}">
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Defecto</th>
+                                    <th scope="col">Encontrados</th>
+                                    <th scope="col">N° de Defectos</th>
+                                    <th scope="col">Peso de Imperfecciones (gr)</th>
+                                    <th scope="col">% de Imperfecciones</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="NGRT" id="NGRT_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='NGRT' value=f.id %} disabled />
+                                      </div>
+                                    </td>
+                                    <td>Negro Total</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRT" id="E_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='NGRT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRT" id="D_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='NGRT' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRT" id="P_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='NGRT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRT" id="POR_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='NGRT' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="AGT" id="AGT_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='AGT' value=f.id %} disabled />
+                                      </div>
+                                    </td>
+                                    <td>Agrio Total</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AGT" id="E_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='AGT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AGT" id="D_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='AGT' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AGT" id="P_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='AGT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AGT" id="POR_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='AGT' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="VC" id="VC_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='VC' value=f.id %} disabled />
+                                      </div>
+                                    </td>
+                                    <td>Vaina/Cereza</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_VC" id="E_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='VC' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_VC" id="D_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='VC' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_VC" id="P_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='VC' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_VC" id="POR_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='VC' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRGR" id="PDRGR_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PDRGR' value=f.id %} disabled  />
+                                      </div>
+                                    </td>
+                                    <td>Piedras Grandes</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRGR" id="E_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRGR" id="D_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PDRGR' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRGR" id="P_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRGR" id="POR_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRMD" id="PDRMD_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PDRMD' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Piedras Medianas</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRMD" id="E_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PDRMD' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRMD" id="D_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PDRGR' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRMD" id="P_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRMD" id="POR_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLGR" id="PLGR_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PLGR' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Palos Grandes</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLGR" id="E_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PLGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLGR" id="D_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PLGR' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLGR" id="P_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PLGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLGR" id="POR_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PLGR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLMD" id="PLMD_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PLMD' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Palos Medianos</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLMD" id="E_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PLMD' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLMD" id="D_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PLMD' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLMD" id="P_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PLMD' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLMD" id="POR_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PLMD' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  
+                                  
+                                </tbody>
+                              </table>
+                          </div>
+                          <div class="tab-pane fade" id="defecto2-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos2-{{m.idMuestra}}">
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Defecto</th>
+                                    <th scope="col">Encontrados</th>
+                                    <th scope="col">N° de Defectos</th>
+                                    <th scope="col">Peso de Imperfecciones (gr)</th>
+                                    <th scope="col">% de Imperfecciones</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PRG" id="PRG_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='PRG' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Pergamino</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PRG" id="E_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='PRG' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PRG" id="D_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='PRG' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PRG" id="P_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='PRG' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PRG" id="POR_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='PRG' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CSCR" id="CSCR_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='CSCR' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Cascara</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CSCR" id="E_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CSCR" id="D_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CSCR" id="P_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CSCR" id="POR_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="RTAT" id="RTAT_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='RTAT' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Roto/Astillado</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_RTAT" id="E_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_RTAT" id="D_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_RTAT" id="P_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_RTAT" id="POR_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPI" id="DPI_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='DPI' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Daños por insectos</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPI" id="E_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPI" id="D_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPI" id="P_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPI" id="POR_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="NGRP" id="NGRP_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='NGRP' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Negro parcial</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRP" id="E_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRP" id="D_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRP" id="P_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRP" id="POR_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="AMGP" id="AMGP_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='AMGP' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Amargo parcial</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AMGP" id="E_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AMGP" id="D_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AMGP" id="P_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AMGP" id="POR_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="FL" id="FL_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='FL' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Flotador</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_FL" id="E_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_FL" id="D_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_FL" id="P_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_FL" id="POR_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CNCH" id="CNCH_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='CNCH' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Concha</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CNCH" id="E_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CNCH" id="D_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CNCH" id="P_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CNCH" id="POR_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PDRPQ" id="PDRPQ_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='PDRPQ' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Piedras pequeñas</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRPQ" id="E_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRPQ" id="D_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRPQ" id="P_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRPQ" id="POR_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PLPQ" id="PLPQ_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='PLPQ' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Palos pequeños</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLPQ" id="E_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLPQ" id="D_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLPQ" id="P_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLPQ" id="POR_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPA" id="DPA_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='DPA' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Daños por agua</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPA" id="E_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPA" id="D_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPA" id="P_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPA" id="POR_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                </tbody>
+                              </table>
+                          </div>
+                        </div>            
+                    </div>
+                  </div>
+                </div>
+                <hr class="separator-form">
+              {% endif %}
+            {% endfor %}
+            {% for s in sensoriales %}
+                {% if s.fkMuestra.idMuestra == m.idMuestra %}
+                  <div class="row align-items-center justify-content-center headerColor py-2 mb-3">
+                    <div class="col-2">
+                        <strong>Muestra: {{ m.idMuestra }}</strong>
+                    </div>
+                    <div class="col-5 row">
+                      <div class="col-4 pt-3">
+                        <strong>Nivel de tueste: </strong>
+                      </div>
+                      <div class="col-8"> 
+                        <div class="range w-75">
+                          <input type="range" class="form-range" min="1" max="3" step="1" id="tueste-{{m.idMuestra}}" name="tueste" required value="{{s.nTueste}}" disabled/>
+                          <div class="row">
+                            <div class="col-4 text-start">B</div>
+                            <div class="col-4 text-center">M</div>
+                            <div class="col-4 text-end">A</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                        <strong>Agua (ml)</strong>
+                        <input class="w-25" type="number" name="agua" id="Agua-{{m.idMuestra}}"  step="1" min="0" max="200" required value="{{s.cAgua}}" readonly>
+                    </div>
+                    <div class="col-2">
+                      <strong>Puntaje Final: <span id="puntajeFinal-{{m.idMuestra}}">{{s.pFinal}}</span></strong>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Fragancia
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Fragancia-{{m.idMuestra}}" name="fragancia" class="form-control calculated"  required value="{{s.fragancia}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                    
+                  </div>
+                  <div class="col-3">
+                    Sabor
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Sabor-{{m.idMuestra}}" name="sabor" class="form-control calculated"  required value="{{s.pSabor}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Acidez
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Acidez-{{m.idMuestra}}" name="acidez" class="form-control calculated"  required value="{{s.acidez}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Cuerpo
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Cuerpo-{{m.idMuestra}}" name="cuerpo" class="form-control calculated"  required value="{{s.cuerpo}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Seco
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="seco-{{m.idMuestra}}" name="seco"  min="1" max="3" step="1"  required value="{{s.seco}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Remanente
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Remanente-{{m.idMuestra}}" name="remanente" class="form-control calculated"  required value="{{s.remanente}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Intensidad de Acidez
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iAcido-{{m.idMuestra}}" name="iacidez"  min="1" max="3" step="1"  required value="{{s.iAcidez}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Intensidad de Cuerpo
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iCuerpo-{{m.idMuestra}}" name="icuerpo"  min="1" max="3" step="1"  required value="{{s.iCuerpo}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Espuma
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="Espuma-{{m.idMuestra}}" name="espuma"  min="1" max="3" step="1"  required value="{{s.espuma}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <!--pendiente revisar los values de cada checkbox-->
+                    Uniformidad
+                    <div class="row mb-3">
+                      {% for i in tazasList %}
+                      {% if i <= s.cUniformidad %}
+                        <div class="col-2">
+                          <input type="checkbox" class="tazas" id="cUniformidad-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                          <label for="cUniformidad-{{i}}-{{m.idMuestra}}">
+                            <img id="cUniformidad-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas uni change-color" src="{% static 'svg/taza.svg' %}"><br>
+                            </label>
+                        </div>
+                      {% else %}
+                        <div class="col-2">
+                          <input type="checkbox" class="tazas" id="cUniformidad-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                          <label for="cUniformidad-{{i}}-{{m.idMuestra}}">
+                            <img id="cUniformidad-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                            </label>
+                        </div>
+                      {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pUniformidad-{{m.idMuestra}}" name="pUniformidad" class="form-control calculated" required value="{{s.pUniformidad}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <!--pendiente revisar los values de cada checkbox-->
+                    Taza Limpia
+                    <div class="row mb-3">
+                      {% for i in tazasList %}
+                        {% if i <= s.cTLimpia %}
+                          <div class="col-2">
+                            <input type="checkbox" class="tazas" id="cTLimpia-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                            <label for="cTLimpia-{{i}}-{{m.idMuestra}}">
+                              <img id="cTLimpia-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas tLmp change-color" src="{% static 'svg/taza.svg' %}"><br>
+                              </label>
+                          </div>
+                        {% else %}
+                          <div class="col-2">
+                            <input type="checkbox" class="tazas" id="cTLimpia-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                            <label for="cTLimpia-{{i}}-{{m.idMuestra}}">
+                              <img id="cTLimpia-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                              </label>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      
+                    </div>
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pTLimpia-{{m.idMuestra}}" name="pTLimpia" class="form-control calculated"  required value="{{s.pTLimpia}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <!--pendiente revisar los values de cada checkbox-->
+                    Dulzor
+                    <div class="row mb-3">
+                      {% for i in tazasList %}
+                        {% if i <= s.cDulzor %}
+                            <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                                <label for="cDulzor-{{i}}-{{m.idMuestra}}">
+                                <img id="cDulzor-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas dlc change-color" src="{% static 'svg/taza.svg' %}"><br>
+                                </label>
+                            </div>
+                        {% else %}
+                            <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                                <label for="cDulzor-{{i}}-{{m.idMuestra}}">
+                                <img id="cDulzor-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                </label>
+                            </div>
+                        {% endif %}
+                      {% endfor %}
+                  </div>
+                  <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pDulzor-{{m.idMuestra}}" name="pDulzor" class="form-control calculated"  required value="{{s.pDulzor}}" max="10" min="0" step="0.25" readonly/>
+                  </div>
+                  </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Balance
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Balance-{{m.idMuestra}}" name="balance" class="form-control calculated"  required value="{{s.balance}}" max="10" min="0" step="0.25"  readonly/>
+                  </div>
+                  <div class="col-3">
+                    Catador
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pCatador-{{m.idMuestra}}" name="pCatador" class="form-control calculated"  required value="{{s.pCatador}}" max="10" min="0" step="0.25" readonly/>
+                  </div>
+                  <div class="col-3">
+                    Rechazo
+                      <input type="number" data-muestra="{{m.idMuestra}}" id="castigo-{{m.idMuestra}}" name="castigo" class="form-control border-0 outlinenone w-50"  required value="{{s.castigo}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-2">
+                      <p><b>Sabores</b></p>
+                    </div>
+                    <div class="col-10 badgeSabor-{{m.idMuestra}}">
+                      {% for sabor in s.sabor.all %}
+                      <span class="badge rounded-pill badge-primary m-1">{{sabor.nameSabor}}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-2">
+                      <p><b>Fragancias/Aromas</b></p>
+                    </div>
+                    <div class="col-10 badgeAroma-{{m.idMuestra}}">
+                      {% for aroma in s.aroma.all %}
+                      <span class="badge rounded-pill badge-warning m-1">{{aroma.nameAroma}}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-12">
+                      <p>Observaciones</p>
+                        <textarea name="comentarios" id="comentarios"  cols="30" rows="4" readonly>
+                          {{s.comentario}}
+                        </textarea>
+                    </div>
+                  </div>
+                  <hr class="separator-form">
+                {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="tab-pane fade" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+            <div class="row h-auto justify-content-center align-items-center mb-5">
+              <div class="col-6"> 
+                <canvas id="polar-{{m.idMuestra}}">
+                  
+                </canvas>
+              </div>
+            </div>
+            {% for f in fisicos %}
+              {% if f.fkMuestra.idMuestra == m.idMuestra %}
+                <input type="hidden" name="peso-{{m.idMuestra}}" value="{{m.peso}}" id="peso-{{m.idMuestra}}">
+                <div class="card border-0 shadow-none">
+                  <div class="card-header">
+                    <div class="row">
+                        <div class="col-2 text-center">
+                            <b>Muestra: {{ m.idMuestra }}</b>
+                        </div>
+                        <div class="col-5" >
+                          <b>Peso total de granos con defectos: </b>
+                          <input class="w-25" type="number" name="pDefectos" id="pDefectos-{{m.idMuestra}}"  step="0.01" min=0 value="{{f.pDefectos|floatformat:-2}}" readonly>
+                        </div>
+                        <div class="col-5" >
+                            <p><b>Porcentaje de granos con defecto: </b><span id="por-{{m.idMuestra}}" class="porDefecto"></span>{{f.porDefectos|floatformat:-2}}%</p>
+                            <input type="hidden" name="porDefectos" id="POR_D_{{m.idMuestra}}" value="0"  >
+                        </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="container-fluid">
+                      <!-- Tabs navs -->
+                        <ul class="nav nav-tabs mb-3" id="fisico-{{m.idMuestra}}" role="tablist">
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="tamiz-{{m.idMuestra}}" data-mdb-toggle="tab" href="#tamizados-{{m.idMuestra}}" role="tab" aria-controls="tamizados-{{m.idMuestra}}" aria-selected="true">TAMIZADO</a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="defectos1-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto1-{{m.idMuestra}}" role="tab" aria-controls="defecto1-{{m.idMuestra}}" aria-selected="false">DEFECTOS 1</a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="defectos2-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto2-{{m.idMuestra}}" role="tab" aria-controls="defecto2-{{m.idMuestra}}" aria-selected="false">DEFECTOS 2</a>
+                          </li>
+                        </ul>
+                  
+                        <!-- Tabs content -->
+                        <div class="tab-content" id="fisico-{{m.idMuestra}}-content">
+                          <div class="tab-pane fade show active" id="tamizados-{{m.idMuestra}}" role="tabpanel" aria-labelledby="tamiz-{{m.idMuestra}}">
+                            <table class="table table-striped">
+                              <td scope="row">
+                                <td>Humedad</td>
+                                <td>
+                                  <input class="w-25" type="number" name="PORhumedad" id="PORhumedad_{{m.idMuestra}}"  step="0.01" min="0" value="{{f.humedad}}" readonly>
+                                </td>
+                                <td>Temperatura del Analisis</td>
+                                <td>
+                                  <input class="w-25" type="number" name="temp" id="temp_{{m.idMuestra}}"  step="0.01" min="0" value="{{f.temp}}" readonly>
+                                </td>
+                              </td>
+                            </table>
+                            <table class="table table-striped">
+                              <thead>
+                                <tr>
+                                  <th scope="col">Determinación de Tamaños</th>
+                                  <th scope="col">300g</th>
+                                  <th scope="col">% de Retención = PCix / PM * 100</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>Criba 20</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC20" id="PC20_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC20' }}" readonly>
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC20" id="POR_PC20_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC20' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 19</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC19" id="PC19_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC19' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC19" id="POR_PC19_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC19' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 18</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC18" id="PC18_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC18' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC18" id="POR_PC18_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC18' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 17</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC17" id="PC17_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC17' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC17" id="POR_PC17_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC17' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 16</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC16" id="PC16_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC16' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC16" id="POR_PC16_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC16' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 15</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC15" id="PC15_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC15' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC15" id="POR_PC15_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC15' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Criba 14</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC14" id="PC14_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC14' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC14" id="POR_PC14_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC14' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Debajo de Criba 14</td>
+                                  <td>
+                                    <input class="w-25 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC-14" id="PC-14_{{m.idMuestra}}"  step="0.01" min="0" value="{{ f.id| get_tamizado_peso:'PC-14' }}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="POR_PC-14" id="POR_PC-14_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{ f.id| get_tamizado_por:'PC-14' }}">
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>TOTAL</td>
+                                  <td>
+                                    <input class="w-25" type="number" name="PCtotal" id="PCtotal_{{m.idMuestra}}"  step="0.01" min="0" value="{{f.pesoTotalTamiz}}">
+                                  </td>
+                                  <td>
+                                    <input class="w-25" type="number" name="PORtotal" id="PORtotal_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{{f.porTotalTamiz}}">
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="tab-pane fade" id="defecto1-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos1-{{m.idMuestra}}">
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Defecto</th>
+                                    <th scope="col">Encontrados</th>
+                                    <th scope="col">N° de Defectos</th>
+                                    <th scope="col">Peso de Imperfecciones (gr)</th>
+                                    <th scope="col">% de Imperfecciones</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="NGRT" id="NGRT_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='NGRT' value=f.id %} disabled />
+                                      </div>
+                                    </td>
+                                    <td>Negro Total</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRT" id="E_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='NGRT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRT" id="D_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='NGRT' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRT" id="P_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='NGRT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRT" id="POR_NGRT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='NGRT' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="AGT" id="AGT_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='AGT' value=f.id %} disabled />
+                                      </div>
+                                    </td>
+                                    <td>Agrio Total</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AGT" id="E_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='AGT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AGT" id="D_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='AGT' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AGT" id="P_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='AGT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AGT" id="POR_AGT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='AGT' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="VC" id="VC_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='VC' value=f.id %} disabled />
+                                      </div>
+                                    </td>
+                                    <td>Vaina/Cereza</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_VC" id="E_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='VC' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_VC" id="D_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='VC' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_VC" id="P_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='VC' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_VC" id="POR_VC_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='VC' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRGR" id="PDRGR_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PDRGR' value=f.id %} disabled  />
+                                      </div>
+                                    </td>
+                                    <td>Piedras Grandes</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRGR" id="E_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRGR" id="D_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PDRGR' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRGR" id="P_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRGR" id="POR_PDRGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRMD" id="PDRMD_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PDRMD' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Piedras Medianas</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRMD" id="E_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PDRMD' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRMD" id="D_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PDRGR' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRMD" id="P_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRMD" id="POR_PDRMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PDRGR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLGR" id="PLGR_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PLGR' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Palos Grandes</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLGR" id="E_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PLGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLGR" id="D_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PLGR' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLGR" id="P_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PLGR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLGR" id="POR_PLGR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PLGR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLMD" id="PLMD_{{m.idMuestra}}" {% get_defecto_checkbox tipo='1' defecto='PLMD' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Palos Medianos</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLMD" id="E_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='1' defecto='PLMD' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLMD" id="D_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='1' defecto='PLMD' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLMD" id="P_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='1' defecto='PLMD' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLMD" id="POR_PLMD_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='1' defecto='PLMD' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  
+                                  
+                                </tbody>
+                              </table>
+                          </div>
+                          <div class="tab-pane fade" id="defecto2-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos2-{{m.idMuestra}}">
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Defecto</th>
+                                    <th scope="col">Encontrados</th>
+                                    <th scope="col">N° de Defectos</th>
+                                    <th scope="col">Peso de Imperfecciones (gr)</th>
+                                    <th scope="col">% de Imperfecciones</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PRG" id="PRG_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='PRG' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Pergamino</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PRG" id="E_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='PRG' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PRG" id="D_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='PRG' value=f.id %}"> 
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PRG" id="P_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='PRG' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PRG" id="POR_PRG_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='PRG' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CSCR" id="CSCR_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='CSCR' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Cascara</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CSCR" id="E_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CSCR" id="D_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CSCR" id="P_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CSCR" id="POR_CSCR_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='CSCR' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="RTAT" id="RTAT_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='RTAT' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Roto/Astillado</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_RTAT" id="E_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_RTAT" id="D_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_RTAT" id="P_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_RTAT" id="POR_RTAT_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='RTAT' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPI" id="DPI_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='DPI' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Daños por insectos</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPI" id="E_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPI" id="D_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPI" id="P_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPI" id="POR_DPI_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='DPI' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="NGRP" id="NGRP_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='NGRP' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Negro parcial</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRP" id="E_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRP" id="D_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRP" id="P_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRP" id="POR_NGRP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='NGRP' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="AMGP" id="AMGP_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='AMGP' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Amargo parcial</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AMGP" id="E_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AMGP" id="D_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AMGP" id="P_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AMGP" id="POR_AMGP_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='AMGP' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="FL" id="FL_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='FL' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Flotador</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_FL" id="E_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_FL" id="D_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_FL" id="P_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_FL" id="POR_FL_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='FL' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CNCH" id="CNCH_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='CNCH' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Concha</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CNCH" id="E_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CNCH" id="D_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CNCH" id="P_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CNCH" id="POR_CNCH_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='CNCH' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PDRPQ" id="PDRPQ_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='PDRPQ' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Piedras pequeñas</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRPQ" id="E_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRPQ" id="D_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRPQ" id="P_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRPQ" id="POR_PDRPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='PDRPQ' value=f.id %}">
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PLPQ" id="PLPQ_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='PLPQ' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Palos pequeños</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLPQ" id="E_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLPQ" id="D_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLPQ" id="P_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLPQ" id="POR_PLPQ_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='PLPQ' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">
+                                      <div class="form-check">
+                                        <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPA" id="DPA_{{m.idMuestra}}" {% get_defecto_checkbox tipo='2' defecto='DPA' value=f.id %} disabled/>
+                                      </div>
+                                    </td>
+                                    <td>Daños por agua</td>
+                                    <td>
+                                      <input class="w-50 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPA" id="E_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_encontrados tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPA" id="D_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_defectos tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPA" id="P_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_peso tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    <td>
+                                      <input class="w-50 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPA" id="POR_DPA_{{m.idMuestra}}"  step="0.01" min="0" readonly value="{% get_defecto_por tipo='2' defecto='DPA' value=f.id %}">
+                                    </td>
+                                    
+                                  </tr>
+                                </tbody>
+                              </table>
+                          </div>
+                        </div>            
+                    </div>
+                  </div>
+                </div>
+                <hr class="separator-form">
+              {% endif %}
+            {% endfor %}
+            {% for s in sensoriales %}
+                {% if s.fkMuestra.idMuestra == m.idMuestra %}
+                  <div class="row align-items-center justify-content-center headerColor py-2 mb-3">
+                    <div class="col-2">
+                        <strong>Muestra: {{ m.idMuestra }}</strong>
+                    </div>
+                    <div class="col-5 row">
+                      <div class="col-4 pt-3">
+                        <strong>Nivel de tueste: </strong>
+                      </div>
+                      <div class="col-8"> 
+                        <div class="range w-75">
+                          <input type="range" class="form-range" min="1" max="3" step="1" id="tueste-{{m.idMuestra}}" name="tueste" required value="{{s.nTueste}}" disabled/>
+                          <div class="row">
+                            <div class="col-4 text-start">B</div>
+                            <div class="col-4 text-center">M</div>
+                            <div class="col-4 text-end">A</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                        <strong>Agua (ml)</strong>
+                        <input class="w-25" type="number" name="agua" id="Agua-{{m.idMuestra}}"  step="1" min="0" max="200" required value="{{s.cAgua}}" readonly>
+                    </div>
+                    <div class="col-2">
+                      <strong>Puntaje Final: <span id="puntajeFinal-{{m.idMuestra}}">{{s.pFinal}}</span></strong>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Fragancia
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Fragancia-{{m.idMuestra}}" name="fragancia" class="form-control calculated"  required value="{{s.fragancia}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                    
+                  </div>
+                  <div class="col-3">
+                    Sabor
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Sabor-{{m.idMuestra}}" name="sabor" class="form-control calculated"  required value="{{s.pSabor}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Acidez
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Acidez-{{m.idMuestra}}" name="acidez" class="form-control calculated"  required value="{{s.acidez}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Cuerpo
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Cuerpo-{{m.idMuestra}}" name="cuerpo" class="form-control calculated"  required value="{{s.cuerpo}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Seco
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="seco-{{m.idMuestra}}" name="seco"  min="1" max="3" step="1"  required value="{{s.seco}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Remanente
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Remanente-{{m.idMuestra}}" name="remanente" class="form-control calculated"  required value="{{s.remanente}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Intensidad de Acidez
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iAcido-{{m.idMuestra}}" name="iacidez"  min="1" max="3" step="1"  required value="{{s.iAcidez}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    Intensidad de Cuerpo
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iCuerpo-{{m.idMuestra}}" name="icuerpo"  min="1" max="3" step="1"  required value="{{s.iCuerpo}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Espuma
+                    <div class="range">
+                      <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="Espuma-{{m.idMuestra}}" name="espuma"  min="1" max="3" step="1"  required value="{{s.espuma}}" disabled />
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <!--pendiente revisar los values de cada checkbox-->
+                    Uniformidad
+                    <div class="row mb-3">
+                      {% for i in tazasList %}
+                      {% if i <= s.cUniformidad %}
+                        <div class="col-2">
+                          <input type="checkbox" class="tazas" id="cUniformidad-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                          <label for="cUniformidad-{{i}}-{{m.idMuestra}}">
+                            <img id="cUniformidad-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas uni change-color" src="{% static 'svg/taza.svg' %}"><br>
+                            </label>
+                        </div>
+                      {% else %}
+                        <div class="col-2">
+                          <input type="checkbox" class="tazas" id="cUniformidad-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                          <label for="cUniformidad-{{i}}-{{m.idMuestra}}">
+                            <img id="cUniformidad-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                            </label>
+                        </div>
+                      {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pUniformidad-{{m.idMuestra}}" name="pUniformidad" class="form-control calculated" required value="{{s.pUniformidad}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <!--pendiente revisar los values de cada checkbox-->
+                    Taza Limpia
+                    <div class="row mb-3">
+                      {% for i in tazasList %}
+                        {% if i <= s.cTLimpia %}
+                          <div class="col-2">
+                            <input type="checkbox" class="tazas" id="cTLimpia-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                            <label for="cTLimpia-{{i}}-{{m.idMuestra}}">
+                              <img id="cTLimpia-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas tLmp change-color" src="{% static 'svg/taza.svg' %}"><br>
+                              </label>
+                          </div>
+                        {% else %}
+                          <div class="col-2">
+                            <input type="checkbox" class="tazas" id="cTLimpia-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                            <label for="cTLimpia-{{i}}-{{m.idMuestra}}">
+                              <img id="cTLimpia-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                              </label>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      
+                    </div>
+                    <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pTLimpia-{{m.idMuestra}}" name="pTLimpia" class="form-control calculated"  required value="{{s.pTLimpia}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <!--pendiente revisar los values de cada checkbox-->
+                    Dulzor
+                    <div class="row mb-3">
+                      {% for i in tazasList %}
+                        {% if i <= s.cDulzor %}
+                            <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                                <label for="cDulzor-{{i}}-{{m.idMuestra}}">
+                                <img id="cDulzor-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas dlc change-color" src="{% static 'svg/taza.svg' %}"><br>
+                                </label>
+                            </div>
+                        {% else %}
+                            <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                                <label for="cDulzor-{{i}}-{{m.idMuestra}}">
+                                <img id="cDulzor-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                </label>
+                            </div>
+                        {% endif %}
+                      {% endfor %}
+                  </div>
+                  <div class="form-outline">
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pDulzor-{{m.idMuestra}}" name="pDulzor" class="form-control calculated"  required value="{{s.pDulzor}}" max="10" min="0" step="0.25" readonly/>
+                  </div>
+                  </div>
+                  </div>
+                  <div class="row mb-3">
+                  <div class="col-3">
+                    Balance
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Balance-{{m.idMuestra}}" name="balance" class="form-control calculated"  required value="{{s.balance}}" max="10" min="0" step="0.25"  readonly/>
+                  </div>
+                  <div class="col-3">
+                    Catador
+                      <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pCatador-{{m.idMuestra}}" name="pCatador" class="form-control calculated"  required value="{{s.pCatador}}" max="10" min="0" step="0.25" readonly/>
+                  </div>
+                  <div class="col-3">
+                    Rechazo
+                      <input type="number" data-muestra="{{m.idMuestra}}" id="castigo-{{m.idMuestra}}" name="castigo" class="form-control border-0 outlinenone w-50"  required value="{{s.castigo}}" max="10" min="0" step="0.25" readonly/>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-2">
+                      <p><b>Sabores</b></p>
+                    </div>
+                    <div class="col-10 badgeSabor-{{m.idMuestra}}">
+                      {% for sabor in s.sabor.all %}
+                      <span class="badge rounded-pill badge-primary m-1">{{sabor.nameSabor}}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-2">
+                      <p><b>Fragancias/Aromas</b></p>
+                    </div>
+                    <div class="col-10 badgeAroma-{{m.idMuestra}}">
+                      {% for aroma in s.aroma.all %}
+                      <span class="badge rounded-pill badge-warning m-1">{{aroma.nameAroma}}</span>
+                      {% endfor %}
+                    </div>  
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-12">
+                      <p>Observaciones</p>
+                        <textarea name="comentarios" id="comentarios"  cols="30" rows="4" readonly>
+                          {{s.comentario}}
+                        </textarea>
+                    </div>
+                  </div>
+                  <hr class="separator-form">
+                {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

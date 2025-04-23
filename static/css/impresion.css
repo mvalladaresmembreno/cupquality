@@ -1,0 +1,192 @@
+html{
+    overflow-x: hidden;
+    min-height: 100%;
+    position: relative;
+    background-color: #c2c2c2;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+body{
+    overflow-x: hidden;
+    max-width: 740px;
+    margin: 0 auto !important;
+    border-radius: 0.5rem
+}
+header{
+    width: 100%;
+}
+
+.navbar{
+    color: #FFC800;
+    width: 100%;
+    background: rgb(33, 37, 41);
+}
+.sidebtn
+{
+    padding: 1rem 1rem;
+}
+.bannerImg{
+    width: 60%;
+    height: 80%;
+    margin-top: 5%;
+}
+.nav-link{
+    color: #FFC800;
+}
+
+.finPag{
+    page-break-after: always;
+}
+.table-sm td, .table-sm th, table thead{
+    padding: 0.125rem;
+    font-size: 100%;
+    word-wrap: break-word;
+}
+table thead tr th{
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center;
+    vertical-align: middle;
+}
+.headerColor
+{
+    background-color: #F2F2F2 !important; 
+    color: black;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+.buttonTazas
+{
+    width: 2.5rem;
+    height: 2.5rem;
+    filter: invert(69%) sepia(9%) saturate(0%) hue-rotate(169deg) brightness(93%) contrast(100%);
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+.change-color
+{
+    filter: invert(0%) sepia(90%) saturate(7429%) hue-rotate(243deg) brightness(84%) contrast(100%);
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+    
+.tazas{
+    display: none;
+}
+
+#marca{
+    color: #FFC800;
+    
+    font-size: 1.25rem;
+    padding-left: 15%;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+.fas{
+    font-size: 1.5rem;
+    color: #FFC800;
+}
+.fa-bars{
+    font-size: 1.5rem;
+    color: #000000;
+}
+#navcol-1{
+    padding-right: 15%;
+}
+
+.separator-form{
+    width: 100%;
+    height: 2px;
+    border-width:0;
+    opacity: 1;
+    color: #FFC800;
+    background-color: #FFC800;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+
+#separator-form{
+    width: 100%;
+    height: 2px;
+    border-width:0;
+    opacity: 1;
+    color: #FFC800;
+    background-color: #FFC800;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+
+.table
+{
+    height: 50%;
+    width: 100%;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+
+.footerColor{ 
+    color: black;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact;
+}
+
+@media print { 
+    html{
+        overflow: hidden;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact;
+
+    }
+    .noprint{
+        display: none;
+    }
+    @page {
+        size: letter portrait !important;
+    }
+    header{
+        top: 0 !important;
+        padding: top !important;
+        position: fixed !important;
+    }
+    .footerResultados{
+        bottom: 0 !important;
+        padding: top !important;
+        position: fixed !important;
+        
+    }
+    .footerProd{
+        bottom: 0 !important;
+        text-align: center !important;
+        padding: top !important;
+        position: fixed !important;
+        margin-bottom: -2px !important;
+        font-size: 12px !important;
+    }
+    .nuevapagtop{
+        margin-top: 5rem !important;
+
+    }
+    
+    .aSensorial{
+        margin-top: 4cm !important;
+        padding: 0 !important;
+        min-width: 20cm !important;
+        min-height: 19cm !important;
+        transform: rotate(-90deg) !important; 
+        
+
+    }
+    .aSensorial mt-3
+    {
+        margin-top: 0 !important;
+    }
+    .table-bordered{
+        border-color: #000000 !important;
+    }
+    *::-webkit-scrollbar { width: 0 !important }
+    * { overflow: -moz-scrollbars-none; }
+}
+
+
+
+  

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es-es">
+<head>
+    {% load static %}
+    {% load utilidades %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="#">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- MDB -->
+    <link href="{% static 'css/mdb/mdb.min.css' %}" rel="stylesheet"/>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    {% block head_css %}
+    {% endblock %}
+    <title>Calidad de Taza{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <div id="banner-lock" class="text-center">
+        <div id="banner-div">
+            <h2><strong>TU DISPOSITIVO ES MUY PEQUEÑO PARA UTILIZAR LA APLICACIÓN, VOLTÉALO O UTILIZA OTRO DISPOSITIVO</strong></h2>
+        </div>
+    </div>
+    <header style="width: 100%;">
+        <div class="row d-flex justify-content-center align-items-center h-100 bg-dark py-2 text-center">
+            <div class="col-4 text-center "><img class="bannerImg" src="{% static 'svg/solidaridad-logo.svg' %}" ></div>
+            <div class="col-4 text-center "></div>
+            <div class="col-4 text-center ">
+                {% if user.is_authenticated %}
+                    <strong class="ps-5 navbar-brand loggedoutnav">Calidad de Taza</strong>
+                {% else %}
+                    <a class="btn btn-rounded savebtn" {% if LOGIN  %} href="{% url 'LandingPage' %}" {% else %} href="{% url 'login' %}" {% endif %}> {% if LOGIN  %} Home {% else %} inicia Sesión {% endif %}</a> 
+                    <a class="btn btn-rounded btn-dark" href="#"> Contactanos </a>
+                {% endif %}
+                </div>
+        </div>
+    </header>
+    
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg secondaryNavbar">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <a class="navbar-brand text-black ms-5" href="#"><strong>{{tittle}}</strong></a>
+          <!-- Toggle button -->
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-mdb-toggle="collapse"
+                data-mdb-target="#navcol-1"
+                aria-controls=""
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Collapsible wrapper -->
+            <div class="collapse navbar-collapse ms-auto text-start" id="navcol-1">
+                <ul class="navbar-nav ms-auto justify-content-center align-items-center">
+                    {% if request.user|has_group:"Laboratorio" %}
+                        {% if request.user|has_group:"Digitador" %}
+                            <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-home" href="{% url 'LabHome' %}"></a></li>
+                            <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-edit editar" href="{% url 'verMuestrasLab' %}"></a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle snIconsColor fas fa-user perfil" 
+                                href="#" id="gestionUser" 
+                                role="button" 
+                                data-mdb-toggle="dropdown" 
+                                aria-expanded="false">
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="gestionUser">
+                                    <li>
+                                    <a class="dropdown-item" href="{% url 'user' %}">Ver Perfil</a>
+                                    </li>
+                                    {% if isBoss or isAdmin %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'userAdmin' %}">Administrar Usuarios</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% elif request.user|has_group:"Catador" %}
+                            <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-home" href="{% url 'LabHome' %}"></a></li>
+                            <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-edit editar" href="{% url 'verMuestrasLab' %}"></a></li>
+                            <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-clipboard-check analisis" href="{% url 'completadosLab' %}" ></a></li>
+                            <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-solid fa-file-excel excel" href="{% url 'perfilMuestras' %}" ></a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle snIconsColor fas fa-user perfil" 
+                                href="#" id="gestionUser" 
+                                role="button" 
+                                data-mdb-toggle="dropdown" 
+                                aria-expanded="false">
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="gestionUser">
+                                    <li>
+                                    <a class="dropdown-item" href="{% url 'user' %}">Ver Perfil</a>
+                                    </li>
+                                    {% if isBoss or isAdmin %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'userAdmin' %}">Administrar Usuarios</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% elif request.user|has_group:"Jefe" %}
+                        <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-home" href="{% url 'LabHome' %}"></a></li>
+                        <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-edit editar" href="{% url 'verMuestrasLab' %}"></a></li>
+                        <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-clipboard-check analisis" href="{% url 'completadosLab' %}" ></a></li>
+                        <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-solid fa-file-excel excel" href="{% url 'perfilMuestras' %}" ></a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle snIconsColor fas fa-user perfil" 
+                            href="#" id="gestionUser" 
+                            role="button" 
+                            data-mdb-toggle="dropdown" 
+                            aria-expanded="false">
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="gestionUser">
+                                <li>
+                                <a class="dropdown-item" href="{% url 'user' %}">Ver Perfil</a>
+                                </li>
+                                {% if isBoss or isAdmin %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'userAdmin' %}">Administrar Usuarios</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-home home" href="{% url 'HomeRegistro' %}"></a></li>
+                    <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-edit editar" href="{% url 'MuestraHome' %}"></a></li>
+                    <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-clipboard-check analisis" href="{% url 'analisisCompletados' %}" ></a></li>
+                    <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-solid fa-file-excel excel" href="{% url 'perfilMuestras' %}"></a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle snIconsColor fas fa-user perfil" 
+                        href="#" id="gestionUser" 
+                        role="button" 
+                        data-mdb-toggle="dropdown" 
+                        aria-expanded="false">
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="gestionUser">
+                            <li>
+                            <a class="dropdown-item" href="{% url 'user' %}">Ver Perfil</a>
+                            </li>
+                            {% if request.user|has_group:"Administrador" %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'userAdmin' %}">Administrar Usuarios</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item"><a class="nav-link snIconsColor fas fa-xl fa-sign-out-alt salir" href=" {% url 'logout' %}" ></a></li>
+                </ul>
+            <!-- Collapsible wrapper -->
+            </div>
+        </div>
+    </nav>
+        {% if not request.user|has_group:"Laboratorio" %}
+        <aside>
+
+            <ul class="nav nav-pills flex-column mb-auto text-center mt-5 position-fixed">
+                <li class="nav-item mb-4"><a href="{% url 'addProd' %}" id="btnProd" class="sidebtn" title="Productor" data-bs-toggle="Productor" data-bs-placement="right"></a></li>
+                <li class="nav-item mb-4"><a href="{% url 'addFinca' %}" id="btnFinca" class="sidebtn" title="Finca" data-bs-toggle="Finca" data-bs-placement="right"> </a></li>
+                <li class="nav-item mb-4"><a href="{% url 'addLote' %}" id="btnLote" class="sidebtn" title="Lote" data-bs-toggle="Lote" data-bs-placement="right"> </a></li>
+            </ul>
+        </aside>
+        {% endif %}
+    {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="container-fluid py-2">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong> {{ message | safe }} </strong> 
+                    <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+        {% block main %}
+        {% endblock %}
+
+    <footer>
+        <div class="container" style="height: 75px;">
+            <div class="row">
+                <div class="col footerBrand">
+                    <p class="solidaridad"><strong>SOLIDARIDAD</strong></p>
+                    <p class="CTM" ><strong>CHANGE THAT MATTERS</strong></p>
+                    <a href="mailto:soporteict@solidaridadnetwork.org">soporteict@solidaridadnetwork.org</a>
+                </div>
+                <div class="col social_container" >
+                    <a class="col social_links" href="https://www.facebook.com/solidaridadlatam" target="_blank">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a class="col social_links" href="https://twitter.com/lat_Solidaridad" target="_blank">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a class="col social_links" href="https://www.linkedin.com/showcase/solidaridad-latinoam%C3%A9rica/" target="_blank">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a class="col social_links" href="https://www.youtube.com/channel/UC4Osga7scfmiBEpnVeF98zA/about" target="_blank">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- MDB -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- MDB -->
+    <script type="text/javascript" src="{% static 'scripts/mdb/mdb.min.js' %}"></script>
+    
+    {% block javascript %}
+    {% endblock %}
+</body>
+</html>

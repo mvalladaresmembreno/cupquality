@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/toggle-switch.css' %}">
+
+
+{% endblock %}
+
+{% block javascript %}
+<script src='https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js'></script>
+<script src="{% static 'scripts/registro.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    : Registrar Muestra
+{% endblock %}
+
+{% block main %}
+  <div class="container mt-3 w-75 rContenedor">
+      <div class="accordion border-0" id="accordionExample">
+        <div class="row align-items-center h-100 py-3 ">
+          <div class="col-12">          
+            <p class="fs-3">Registro de Muestra</p>
+            <hr class="separator-form">
+            </div>
+        </div>
+
+          <div class="steps">
+              <progress id="progress" value=0 max=100 ></progress>
+              <div class="step-item">
+                  <button class="step-button text-center shadow-none" type="button" data-toggle="collapse"
+                      data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="step1">
+                      1
+                  </button>
+                  <div class="step-title"></div>
+              </div>
+              <div class="step-item">
+                  <button class="step-button text-center collapsed" type="button" data-toggle="collapse"
+                      data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" id="step2">
+                      2
+                  </button>
+                  <div class="step-title"></div>
+              </div>
+          </div>
+
+          <div class="card border-0 shadow-none ms-5">
+              <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                  data-parent="#accordionExample">
+                  <div  id="headingOne" class="titleName">Origen de la muestra</div>
+                  <div class="card-body">
+
+                     <!--Productor-->
+                    <div class="row py-2 container h-100 py-3 col-12 col-md-11 ms-5">
+                      <div class="col-12">
+                        <label class="form-label text-black" for="meta">Productor propietario de la muestra</label>
+                        <div class="input-group mb-3">
+                            <select class="form-select" id="productor" aria-label="Productor" name="productor" form="addMuestra" required>
+                                <option value="" default>Seleccione el Productor</option>
+                                {% for p in productores %}
+                                <option value="{{p.idProd}}">{{p.firstnameProd}} {{p.lastnameProd}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!--Finca-->
+                    <div class="row py-2 container h-100 col-12 col-md-11 ms-5">
+                      <div class="col-12">
+                        <label class="form-label text-black" for="meta">Nombre de la finca</label>
+                        <div class="input-group mb-3">
+                            <select class="form-select" id="finca" aria-label="Finca" name="finca" form="addMuestra" required>
+                                <option value="" default>Seleccione la Finca</option>
+                            </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!--Proceso de la muestra-->
+                    <div class="row py-2 container h-100 col-12 col-md-11 ms-5">
+                      
+                      <div class="col-12">
+                        <label class="form-label text-black">Proceso de la muestra</label>
+                        <div class="row">
+                          <div class="col-4">
+                            <div class="form-check">
+                              <input form="addMuestra" class="form-check-input" name="procesadoMuestra" type="radio" id="lavado" value="1" required>
+                              <label class="form-check-label" for="lavado">Lavado</label>
+                            </div>
+                          </div>
+                          
+                          <div class="col-4">
+                            <div class="form-check">
+                              <input form="addMuestra" class="form-check-input" name="procesadoMuestra"type="radio" id="natural" value="2" required>
+                              <label class="form-check-label" for="natural">Natural</label>
+                            </div>
+                          </div>
+  
+                          <div class="col-4">
+                            <div class="form-check">
+                              <input form="addMuestra" class="form-check-input" name="procesadoMuestra" type="radio" id="honey" value="3" required>
+                              <label class="form-check-label" for="honey">Honey</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row py-2 container h-100 col-12 col-md-11 ms-5">
+                      <!--Ciclo agrícola de la muestra-->
+                      <div class="col-6">
+                        <label for="cicloAgricola" class="form-label text-black">Ciclo agrícola de la muestra</label>
+                        <div class="input-group mb-3">
+                          <select class="form-select" id="cicloAgricola" aria-label="cicloAgricola" name="cicloAgricola" form="addMuestra" required>
+                              <option value="" default>Seleccione el ciclo agrícola</option>
+                              {% if ciclos %}
+                                  {% for c in ciclos %}
+                                  <option value="{{ c.0 }}"> {{ c.1 }}</option>
+                                  {% endfor %}  
+                              {% endif %}
+                          </select>
+                        </div>
+                      </div>
+                      <!--Fecha de entrega de la muestra-->
+                      <div class="col-6">
+                        <label class="form-label text-black" for="fechaEntregado">Fecha de entrega de la muestra</label>
+                        <div class="input-group mb-3">
+                            <input form="addMuestra" type="date" class="form-control" id="fechaEntregado" name="fechaEntregado" required>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!--Next Button-->
+                    <div class="d-grid  d-md-flex justify-content-md-end">
+                        <button class="btn btn-outline-warning me-md-2" type="button" onclick="clic2();">Siguiente</button>
+                    </div>
+                    
+                  </div>
+              </div>
+          </div>
+
+          <div class="card border-0 shadow-none ms-5">
+              <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                <div  id="headingTwo" class="titleName">Aceptacion de la muestra</div>
+                  <div class="card-body">
+
+                    <!--Lote-->
+                    <div class="row py-2 container h-100 col-12 col-md-11 ms-5">
+                        <div class="col-6">
+                          <label class="form-label text-black">Sede de Recepción</label>
+                          <div class="input-group mb-3">
+                              <select class="form-select" id="sRecepcion" aria-label="sedeRecepción" name="sRecepcion" form="addMuestra" required>
+                                  <option value="" default>Seleccione sede</option>
+                                  {% for s in sedes %}
+                                    <option value="{{s.id_sede}}">{{s.name_sede}}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <label class="form-label text-black">Nombre o número de Lote</label>
+                          <div class="input-group mb-3">
+                              <select class="form-select" id="lote" aria-label="Lote" name="lote" form="addMuestra" required>
+                                  <option value="" default>Seleccione Lote</option>
+                              </select>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="row py-2 container h-100 col-12 col-md-11 ms-5">
+                      <!--Tipo de muestra-->
+                      <div class="col-12">
+                        <label class="form-label text-black"for="">Tipo de muestra</label>
+                        <div class="row">
+                          <div class="col-4">
+                            <div class="form-check">
+                              <input form="addMuestra" class="form-check-input" name="tMuestra" type="radio" id="oro" value="2" required>
+                              <label class="form-check-label" for="oro">Oro</label>
+                            </div>
+                          </div>      
+                          <div class="col-4">
+                            <div class="form-check">
+                              <input form="addMuestra" class="form-check-input" name="tMuestra"type="radio" id="pergamino" value="1" required>
+                              <label class="form-check-label" for="pergamino">Pergamino</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--Peso de la muestra-->
+                    <div class="row py-4 container h-100 col-12 col-md-11 ms-5">
+                        <div class="col">
+                            <label class="form-label text-black">Peso de la Muestra</label>
+                            <div class="row">
+                                <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="addMuestra" class="form-check-input" name="pMuestra" type="radio" id="100" value="100">
+                                    <label class="form-check-label" for="100">100gr</label>
+                                  </div>
+                                </div>
+                                
+                                <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="addMuestra" class="form-check-input" name="pMuestra"type="radio" id="300" value="300">
+                                    <label class="form-check-label" for="300">300gr</label>
+                                  </div>
+                                </div>
+
+                                <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="addMuestra" class="form-check-input" name="pMuestra"type="radio" id="350" value="350">
+                                    <label class="form-check-label" for="350">350gr</label>
+                                  </div>
+                                </div>
+
+                                <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="addMuestra" class="form-check-input" name="pMuestra"type="radio" id="500" value="500">
+                                    <label class="form-check-label" for="500">500gr</label>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Estado fisico de embalaje de muestra-->
+                    <div class="row container py-4 h-100 col-12 col-md-11 ms-5">
+                        <div class="col-12">
+                            <div class="row">
+                             
+                              <div class="col-12">
+                                <label class="form-label py-2 text-black">Estado físico del embalaje de Muestra</label>
+                                <div class="row">
+                                  <div class="col-3">
+                                    <div class="form-check">
+                                      <input form="addMuestra" checked class="form-check-input" type="checkbox" value="4" name="dEmbalaje" id="sBueno">
+                                      <label class="form-check-label" for="sBueno">Saco en buen estado</label>
+                                    </div>
+                                  </div>
+                                  
+                                    <div class="col-3">
+                                        <div class="form-check">
+                                          <input form="addMuestra" disabled="true" class="form-check-input habilitador" type="checkbox" value="3" name="dEmbalaje" id="sRoto">
+                                          <label class="form-check-label " for="sRoto">Saco roto</label>
+                                        </div>
+                                    </div>
+    
+                                    <div class="col-3">
+                                        <div class="form-check">
+                                          <input form="addMuestra" disabled="true" class="form-check-input habilitador" type="checkbox" value="2" name="dEmbalaje" id="sOlores">
+                                          <label class="form-check-label" for="sOlores">Saco con Olores</label>
+                                        </div>
+                                    </div>
+    
+                                    <div class="col-3">
+                                        <div class="form-check">
+                                          <input form="addMuestra" disabled="true" class="form-check-input habilitador" type="checkbox" value="1" name="dEmbalaje" id="sDerrames">
+                                          <label class="form-check-label" for="sDerrames">Saco con Derrames</label>
+                                        </div>
+                                    </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!--switch y botones-->
+                    <div class="row container py-4 h-100 ms-5">
+                      <!-- Switch -->
+                      <div class="col-6">
+                        <label class="form-check-label">¿Se rechaza la muestra?</label>
+                        <input form="addMuestra" type="hidden" name="aceptacionMuestra" value="0" id="aceptacionMuestra">
+                        <div class="div-switch">
+                            <input class="input" id="toggleAM" type="checkbox">
+                                <label class="label" for="toggleAM">
+                                    <div class="left">
+                                        No
+                                    </div>
+                                    <div class="switch">
+                                        <span class="slider round slider-yellow round"></span>
+                                    </div>
+                                    <div class="right">
+                                        Si
+                                    </div>
+                                </label>
+                          </div>
+                      </div>
+
+                       <!--Procesos a llevarse a cabo-->
+
+                       <div class="col-6">
+                        <label for="">Seleccione los procesos a realizarse en la muestra</label>
+                          <div class="row">
+                            <!--Analisis fisico-->
+                          <div class="col-6 text-center">
+                            <input type="checkbox" class="procesos" id="aFisico" name="procesoMuestra" form="addMuestra" value="1">
+                            <label for="aFisico">
+                              <img id="iaFisico" class="buttonProcesos" src="{% static 'svg/coffee-beans.svg' %}"><br>
+                              Analisis Físico
+                            </label>
+                            
+                          </div>
+
+                          <!--Analisis sensorial-->
+                          <div class="col-6 text-center">
+                            <input type="checkbox" class="procesos" id="aSensorial" name="procesoMuestra" form="addMuestra" value="2">
+                            <label for="aSensorial">
+                              <img id="iaSensorial" class="buttonProcesos" src="{% static 'svg/coffee-cup.svg' %}"> <br>
+                              Analisis Sensorial
+                            </label>
+                          </div>
+                          </div>
+                    
+                      </div>
+                    </div>
+
+                    <!--Observaciones-->
+                    <div class="row py-4 container h-100 col-12 col-md-12 ms-5">
+                      <div class="col-12">
+                        <label for="observaciones" class="form-label text-black">Observaciones de la muestra</label>
+                        <textarea type="text" name="observaciones" class="form-control" id="observaciones" placeholder="Observaciones" rows="3" form="addMuestra"></textarea>
+                      </div>
+                    </div>
+                  
+                    <!--Buttons-->
+                    <div class="d-grid  d-md-flex justify-content-md-end">
+
+                      <!--Back Button-->
+                      <button class="btn btn-outline-danger me-2" type="button" onclick="clic2();clic1();">Regresar</button>
+                      <!--1st Step-->
+                      <button class="btn btn-outline-warning me-2" onclick="saveMuestra(event, true);">Guardar y Crear Nuevo</button>
+                      <!--Save Changes Button-->
+                      <button class="btn btn-outline-success me-2" type="submit" form="addMuestra">Guardar</button>
+                      
+                    </div>
+                    <form onsubmit="saveMuestra(event, false);" id="addMuestra">
+                      {% csrf_token %}
+                    </form>
+                      
+                  </div>
+              </div>
+          
+          </div>
+      </div>    
+  </div>
+
+{% endblock %}

@@ -1,0 +1,130 @@
+.titleName
+{
+    /*font-weight: 500;*/
+    font-size: 1.5rem;
+    
+}
+.titleFirstStep
+{
+    text-align: start;
+}
+.titleSecondStep
+{
+    text-align: center;
+}
+.textThirdStep
+{
+    text-align: end;
+}
+#AnalisisText
+{
+    font-weight: 600;
+}
+.separator-analisis{
+    width: 100%;
+    height: 2px;
+    border-width:0;
+    opacity: 1;
+    color: #FFC800;
+    background-color: #FFC800;
+}
+
+.cardcomp{
+    border-bottom: solid; 
+    border-color: #9ebf5e;
+    
+}
+.cardcancel{
+    border-bottom: solid; 
+    border-color: #ED6B69;
+}
+.card-body
+{
+    padding: 2rem 0rem;
+}
+
+.actcomp{
+    background-color: #F0F5E6;
+}
+.actcancel{
+    background-color: #FDEEED;
+}
+.editbtn{
+    background-color: #FFC800; 
+    border-top-right-radius: 15%; 
+    padding: 2.3rem;
+    padding-right:2.4 ;
+    padding-top: 3.75rem;
+}
+.cancelbtn{
+    background-color: RGB(236,107,105); 
+    padding: 2.3rem;
+}
+.compbtn{
+    background-color: RGB(158,191,95); 
+    border-top-right-radius: 0%; 
+    padding: 2.3rem;
+    padding-top: 2.75rem;
+    padding-bottom: 3rem;
+}
+.doneButton{
+    background-color: RGB(158,191,95);
+}
+.fechaact{
+    margin-bottom: 0.75rem;
+}
+.imgComplete{
+    width: 50%;  
+    
+}
+.img70
+{
+    width: 70%;
+}
+.img80
+{
+    width: 80%;
+}
+.img100{
+    width: 100%;
+}
+.ruedaSabor{
+    display: inline-block;
+    margin-right: 0px;
+}
+.selectSabor{
+    display: inline-block;
+    margin-right: 0px;
+}
+@media screen and (max-width: 1199px) {
+    .card{
+        width: 80%;
+        margin-left: 6rem;
+    }
+
+    .row{
+        flex-wrap: nowrap;
+    }
+    .cancelact , .compact , .editaract
+    {
+        transform: translate(-1rem);
+    }
+    
+    
+}
+@media screen and (max-width: 1000px) {
+    .card{
+        width: 80%;
+        margin-left: 4rem;
+    }
+}
+@media screen and (max-width: 768px) {
+    .card{
+        width: 80%;
+        margin-left: 2rem;
+    }
+    .card-pend{
+        width: 100%;
+        margin-left: 3rem;
+    }
+}

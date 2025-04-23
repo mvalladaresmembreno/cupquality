@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/signup.css' %}">
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'scripts/signup.js' %}"></script>
+{% endblock %}
+{% block title %}
+    : Registrarse
+{% endblock %}
+
+{% block main %}
+
+    <div class="container py-5">
+            <div class="container h-100">
+              <div class="row d-flex justify-content-center align-items-center h-100 ">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                        <div class="card-body p-4 mb-4 text-left">
+                            <form action="{% url 'signup' %}" method="POST">
+                                    {% csrf_token %}
+                                    <h3 class="">Crear Usuario</h3>
+                                    <hr id="separator-form">
+                                    {% if form.errors %}
+                                        <p>Tu usuario y contraseña no coinciden con tus credenciales. Intentalo otra vez.</p>
+                                    {% endif %}
+                                    {% if next %}
+                                        {% if user.is_authenticated %}
+                                            <p>No tienes permiso para acceder a esta página. Para continuar, inicia sesión con una cuenta existente.</p>
+                                        {% else %}
+                                            <p>Debes iniciar sesión para ver esta página.</p>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if error %}
+                                        <div class="alert alert-warning" role="alert">
+                                            {{ error }}
+                                        </div>
+                                    {% endif %}
+                                    <label class="form-label text-black" for="name">Nombres:</label>
+                                    <div class="input-group mb-4">
+                                        <input class="form-control" type="text" id="name" name="name" placeholder="Escribe tus nombres" value="" required autocomplete="off">
+                                    </div>
+                                    <label class="form-label text-black" for="lastname">Apellidos:</label>
+                                    <div class="input-group mb-4">
+                                        <input class="form-control" type="text" id="lastname" name="lastname" placeholder="Escribe tus apellidos" value="" required autocomplete="off">
+                                    </div>
+                                    <label class="form-label text-black" for="email">Email</label>
+                                    <div class="input-group mb-4">
+                                        <input class="form-control" type="email" id="email" name="email" placeholder="Escribe tu mail" value="" required autocomplete="off">
+                                    </div>
+                                    <div class="row justify-content-center mb-3">
+                                        <div class="col-10">
+                                            <h5>Organización</h5>
+                                            <hr class="separatorProfile"></hr>
+                                            <select name="org" id="org-{{u.usuario.id}}" class="select" data-mdb-container="#editarUsuario-{{u.usuario.id}}">
+                                                {% for o in organizaciones %}
+                                                    <option value="{{o.id_org}}">{{o.name_org}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-center mb-3">
+                                        <div class="col-10">
+                                            <h5>Roles</h5>
+                                            <hr class="separatorProfile"></hr>
+                                            <select name="roles" id="roles-{{u.usuario.id}}" class="select disable-toggle-all" multiple data-mdb-container="#editarUsuario-{{u.usuario.id}}">
+                                                {% for r in roles %}
+                                                    <option value="{{r.id}}">{{r.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <label class="form-label text-black" for="password">Contraseña </label>
+                                    
+                                    <div class="input-group mb-0" >
+                                        <input class="form-control" type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Escribe aqui tu contraseña" value="" required>
+                                        <span class="input-group-text">
+                                        <i class="fas fa-eye" id="togglePasswordP" 
+                                        style="cursor: pointer"></i>
+                                        </span>
+                                    </div>
+                                    <div class="form-helper" style="font-size: .75rem;">
+                                        <p>Debe contener minimo mayusculas, minusculas, numeros y signos (@,!,?)</p> 
+                                    </div>
+                                    <label class="form-label text-black" for="passwordC">Confirmación de Contraseña</label>
+                                    <div class="input-group mb-4">
+                                        <input class="form-control" type="password" id="passwordC" name="passwordc" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Confirma tu contraseña " value="" required>
+                                        <span class="input-group-text">
+                                        <i class="fas fa-eye" id="togglePasswordPC" 
+                                        style="cursor: pointer"></i>
+                                        </span>
+                                    </div>
+                                    <div class="text-center">
+                                        <a href="{% url 'login' %}" class="btn btn-dark"><strong>Inicio de Sesión</strong></a>
+                                        <button id="creation" class="btn btn-warning createbtn" type="submit"><strong>Crear Cuenta</strong></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

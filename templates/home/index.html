@@ -1,0 +1,565 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/landing.css' %}">
+{% endblock %}
+{% block javascript %}
+<script src="{% static '/scripts/landing.js'%}"></script>
+{% endblock %}
+
+{% block title %}
+    : Bienvenido
+{% endblock %}
+
+{% block main %}
+    <div class="container mb-auto">
+        <div class="row">
+            <div class="col-md-12">
+                <!--Inicio card con foto-->
+                <div class="card mb-3 shadow-none">
+                    <div class="row g-0">
+                      <div class="col-md-6">
+                        <div class="card-body">
+                          <h1 class="card-title mt-3">La Aplicación Web que permite digitalizar el registro del proceso de la Catación de Café</h1>
+                          <!-- Button trigger modal -->
+                            <button type="button" class="mt-5 btn btn-soli" data-mdb-toggle="modal" data-mdb-target="#modalContacto">Comienza ahora</button>
+
+                              <!-- Modal -->
+                              <div
+                                class="modal fade"
+                                id="modalContacto"
+                                data-mdb-backdrop="static"
+                                data-mdb-keyboard="false"
+                                tabindex="-1"
+                                aria-labelledby="modalContacto"
+                                aria-hidden="true"
+                              >
+                                <div class="modal-dialog modal-lg">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="modalContacto">Contáctanos</h5>
+                                      <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <h3 class="text-center mt-5 mb-5">¿Deseas utilizar la aplicación?</h3>
+                                      <h5 class="text-center mt-5 mb-5">Comunicate con tus preguntas, inquietudes y desafíos. O simplemente para saludar. 
+                                        Estaremos encantados de  ayudarte.</h5>
+                                    </div>
+                                    <div class="modal-footer"></div>
+                                  </div>
+                                </div>
+                              </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <img
+                          src="{% static 'jpg/coffee.jpg' %}"
+                          class="img-fluid rounded-start"
+                        />
+                      </div>
+                    </div>
+                </div>
+                <hr class="separator"></hr>
+
+                <!--Carrousel-->
+                <div class="slideshow-container mb-3">
+                    <div class="mySlides">
+                      <h2>Calidad de Taza es una herramienta digital pensada fortalecer el seguimiento productivo y de calidad mediante un registro digital de características físicas y sensoriales del café </h2>
+                    </div>
+                    
+                    <div class="mySlides">
+                      <h2>Su principal objetivo es digitalizar el proceso de recepción y catación de muestras de café, con el fin de generar gráficos y reportes que permitan una mejor visualización de la información</h2>
+                    </div>
+                    
+                    <a class="prev" onclick="plusSlides(-1)">❮</a>
+                    <a class="next" onclick="plusSlides(1)">❯</a>
+                  
+                </div>
+
+                <!--Componentes de Taza-->
+                <hr class="separator">
+                <h3 class="text-center mt-3 mb-3">Componentes de Calidad de Taza</h3>
+                <!-- Tabs navs -->
+                <ul class="nav nav-tabs nav-fill mb-3" id="ex1" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="ex2-tab-1" data-mdb-toggle="tab" href="#ex2-tabs-1" role="tab" aria-controls="ex2-tabs-1" aria-selected="true">Origen de Muestra</a>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="ex2-tab-2" data-mdb-toggle="tab" href="#ex2-tabs-2" role="tab" aria-controls="ex2-tabs-2" aria-selected="false">Registro de Muestra</a>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="ex2-tab-3" data-mdb-toggle="tab" href="#ex2-tabs-3" role="tab" aria-controls="ex2-tabs-3" aria-selected="false">Análisis de Muestra</a>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="ex2-tab-4" data-mdb-toggle="tab" href="#ex2-tabs-4" role="tab" aria-controls="ex2-tabs-4" aria-selected="false">Resultados de Muestra</a>
+                  </li>
+                </ul>
+                <!-- Tabs content -->
+                <div class="tab-content mb-3" id="ex2-content">
+                  <!-- ORIGEN DE MUESTRA -- prod, finca, lote -->
+                  <div class="tab-pane fade show active" id="ex2-tabs-1" role="tabpanel" aria-labelledby="ex2-tab-1">
+                    <h5 class="mt-5 text-center">¡Crea Productores, Fincas y Lotes!</h5>
+                    <p class="mb-5 text-center">Registra la trazabilidad completa de la Muestra desde su inicio.</p>
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/crear-productor.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Crea Productores</h5>
+                            <p class="card-text">
+                              Rellena la información correspondiente y crea a los Productores propietarios de las Muestras
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/crear-finca.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Crea Fincas</h5>
+                            <p class="card-text">
+                              ¡Puedes crear las fincas que desees de un mismo Productor! 
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/crear-lote.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Crea Lotes</h5>
+                            <p class="card-text">¡Puedes crear varios lotes en una misma Finca!</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="separator">
+                  </div>
+                  
+                  <!-- REGISTRO DE MUESTRA -->
+                  <div class="tab-pane fade" id="ex2-tabs-2" role="tabpanel" aria-labelledby="ex2-tab-2">
+                    <h5 class="mt-5 text-center">¡Registra tus muestras!</h5>
+                    <p class="mb-5 text-center">Ingresa información relevante de la Muestra de café recibida por el laboratorio, así como de su estado físico de embalaje</p>
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/registro-muestra-1.png' %}" class="card-img-top"/>
+                          <div class="card-body card-color">
+                            <h5 class="card-title">Origen de Muestra</h5>
+                            <p class="card-text">
+                              Rellena el Origen de la muestra, asi como el proceso, ciclo agrícola y fecha de recepción
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/registro-muestra-2.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Aceptación de muestra</h5>
+                            <p class="card-text">Selecciona la sede de tu laboratorio que recibió la muestra, así como el lote, tipo de muestra, peso, e información relevante respecto al estado del saco en que fue entregada la muestra. Selecciona también en esta parte los procesos a aplicarse a la muestra</p>
+                          </div>
+                        </div>
+                      </div>
+                      <hr class="separator">
+                    </div>
+                  </div>
+
+                  <!--ANALISIS DE MUESTRAS-->
+                  <div class="tab-pane fade" id="ex2-tabs-3" role="tabpanel" aria-labelledby="ex2-tab-3">
+                    <h5 class="mt-5 text-center">¡Realiza el Análisis Físico!</h5>
+                    <p class="mb-5 text-center">Sigue los pasos y rellena la información física de la Muestra, como tamizado y defectos</p>
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/fisico-tamizado.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Tamizado</h5>
+                            <p class="card-text">
+                              Inicia el análisis fisico de la Muestra agregando datos de su tamizado, así como información de su peso, nivel de humedad y temperatura de análisis. Selecciona también la sede de tu laboratorio en donde se realiza el análisis
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/fisico-defectos-1.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Defectos de tipo 1</h5>
+                            <p class="card-text">Continúa el análisis fisico de la muestra seleccionando sus defectos de tipo 1 y rellenando la información correspondiente</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/fisico-defectos-2.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Defectos de tipo 2</h5>
+                            <p class="card-text">Finaliza el análisis fisico de la muestra seleccionando sus defectos de tipo 2 y rellenando la información correspondiente, guardando de esta manera la información</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <h5 class="mt-5 text-center">¡... y también el Análisis Sensorial!</h5>
+                    <p class="mb-5 text-center">Rellena la información Sensorial de la Muestra, asi como Aromas y Sabores</p>
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/sensorial.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Análisis Sensorial</h5>
+                            <p class="card-text">
+                              Rellena la información sensorial de la muestra, basada en el estándar de catación SCAA
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/sensorial-sabor.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Sabores de Muestra</h5>
+                            <p class="card-text">Selecciona los sabores de la muestra ayudándote de la tabla SCAA para sabores</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card card-color">
+                          <img src="{% static 'png/sensorial-aroma.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Fragancias de Muestra</h5>
+                            <p class="card-text">Selecciona los aromas de la muestra ayudándote de la tabla SCAA para aromas</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="separator">
+                  </div>
+                  
+                  <!--RESULTADOS DE MUESTRA-->
+                  <div class="tab-pane fade" id="ex2-tabs-4" role="tabpanel" aria-labelledby="ex2-tab-4">
+                    <h5 class="mt-5 text-center">¡Analiza los resultados de Muestra!</h5>
+                    <p class="mb-5 text-center">Visualiza los resultados individuales y colectivos. Haz uso de la información para agilizar los procesos de venta, capacitación y asistencia técnica</p>
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                      <div class="col">
+                        <div class="card h-100 card-color">
+                          <img src="{% static 'png/perfil-resultados.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Resultados de Análisis de Muestra</h5>
+                            <p class="card-text">
+                              Genera un archivo PDF descargable con todos los análisis realizados a la muestra
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card h-100 card-color">
+                          <img src="{% static 'png/perfil-muestra.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Resultados de Defectos para Productores</h5>
+                            <p class="card-text">Genera un archivo PDF descargable con la información de defectos presentados en la muestra con el fin de brindarle retroalimentación al productor propietario de la Muesta</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card h-100 card-color">
+                          <img src="{% static 'png/perfil-muestras.png' %}" class="card-img-top"/>
+                          <div class="card-body">
+                            <h5 class="card-title">Historial de Muestras</h5>
+                            <p class="card-text">Genera un archivo en Excel descargable con el historial completo de muestras realizados por el laboratorio o la organización</p>
+                          </div>
+                        </div>
+                      </div>
+                      <hr class="separator">
+                    </div>
+
+                  </div>
+                </div>
+                <!-- Tabs content -->
+
+                <!--Beneficios-->
+                <div class="d-flex p-2">
+                  <img src="{% static 'png/aromas-scaa.png' %}" class="img-fluid" />
+                  <div class="container">
+                    <h2>Beneficios de utilizar Calidad de Taza</h2>
+                    <div style="font-size: 1.5rem;">
+                        <div><i class="fas fa-circle-check fa-fw fa-3x mt-5 mb-5 iconsColor"></i>Basada en el estándar de catación SCAA</div>
+                        <div><i class="fas fa-chart-simple fa-fw fa-3x mt-3 mb-5 iconsColor"></i> Identificación y planeación</div>
+                        <div><i class="fas fa-clock fa-fw fa-3x mt-3 mb-5 iconsColor"></i> Eficiencia de tiempo</div>
+                        <div><i class="fa-regular fa-clipboard fa-fw fa-3x mt-3 mb-5 iconsColor"></i> Visualización intuitiva de resultados</div>
+                        <div><i class="fa-solid fa-seedling fa-fw fa-3x mt-3 mb-5 iconsColor"></i> Recomendaciones especializadas</div>
+                    </div>        
+                  </div>
+                  <img src="{% static 'png/sabores-scaa.png' %}" class="img-fluid" />
+                </div>
+                <hr class="separator"></hr>
+
+                <!--PRICING TABLE-->
+                <div class="card mb-3 shadow-none">
+                  <div class="row g-0">
+                    <div class="col-12">
+                      <h2 class="mt-5 text-center">Licencias en Calidad de Taza</h2>
+                      <h6 class="mb-5 text-center">Existen diversos tipos de Usuario en Calidad de Taza, conócelos todos:</h6>
+
+                      <!-- Tabs navs -->
+                      <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
+                        <li class="nav-item" role="presentation">
+                          <a
+                            class="nav-link active"
+                            id="ex3-tab-1"
+                            data-mdb-toggle="tab"
+                            href="#ex3-tabs-1"
+                            role="tab"
+                            aria-controls="ex3-tabs-1"
+                            aria-selected="true"
+                            >Mensualmente</a
+                          >
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <a
+                            class="nav-link"
+                            id="ex3-tab-2"
+                            data-mdb-toggle="tab"
+                            href="#ex3-tabs-2"
+                            role="tab"
+                            aria-controls="ex3-tabs-2"
+                            aria-selected="false"
+                            >Anualmente</a
+                          >
+                        </li>
+                      </ul>
+                      <!-- Tabs navs -->
+
+                      <!-- Tabs content -->
+                      <!-- MENSUAL -->
+                      <div class="tab-content" id="ex2-content">
+                        <div class="tab-pane fade show active" id="ex3-tabs-1" role="tabpanel" aria-labelledby="ex3-tab-1">
+                          <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col"></th>
+                                <th scope="col" class="text-center">Gerente</th>
+                                <th scope="col" class="text-center">Catador</th>
+                                <th scope="col" class="text-center">Digitador</th>
+                                <th scope="col" class="text-center">Visualización</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th scope="row" class="text-center">Creación de Productores, Fincas y Lotes</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td>
+                                    
+                                </td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Registro y edición de Muestras</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Registro y edición de Análisis Físico</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Registro y edición de Análisis Sensorial</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Conciliación de Muestras</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Visualización de Reportes Agregados</th>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Visualización de Resultados</th>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Descarga de Reportes en PDF</th>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Descargar Excel con información de Muestras</th>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Acceso a información de Catadores</th>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <!--GERENTE-->
+                                <td class="text-center">
+                                  <h6>Desde $20</h6>
+                                </td>
+                                <!--CATADOR--> 
+                                <td class="text-center">
+                                  <h6>Desde $15</h6>
+                                </td>
+                                <!--DIGITADOR-->
+                                <td class="text-center">
+                                  <h6>Desde $10</h6>
+                                </td>
+                                <!--VISUALIZACION-->
+                                <td class="text-center">
+                                  <h6>Desde $6</h6>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!-- ANUAL -->
+                        <div class="tab-pane fade" id="ex3-tabs-2" role="tabpanel" aria-labelledby="ex3-tab-2">
+                          <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col"></th>
+                                <th scope="col" class="text-center">Gerente</th>
+                                <th scope="col" class="text-center">Catador</th>
+                                <th scope="col" class="text-center">Digitador</th>
+                                <th scope="col" class="text-center">Visualización</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th scope="row" class="text-center">Creación de Productores, Fincas y Lotes</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td>
+                                    
+                                </td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Registro y edición de Muestras</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Registro y edición de Análisis Físico</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Registro y edición de Análisis Sensorial</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Conciliación de Muestras</th>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Visualización de Reportes Agregados</th>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Visualización de Resultados</th>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Descarga de Reportes en PDF</th>
+                                <td class="text-center">✔</td>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Descargar Excel con información de Muestras</th>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-center">✔</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="text-center">Acceso a información de Catadores</th>
+                                <td class="text-center">✔</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <!--GERENTE-->
+                                <td class="text-center">
+                                  <h6>Desde $216</h6>
+                                </td>
+                                <!--CATADOR--> 
+                                <td class="text-center">
+                                  <h6>Desde $162</h6>
+                                </td>
+                                <!--DIGITADOR-->
+                                <td class="text-center">
+                                  <h6>Desde $108</h6>
+                                </td>
+                                <!--VISUALIZACION-->
+                                <td class="text-center">
+                                  <h6>Desde $65</h6>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        
+                      </div>
+                      <!-- Tabs content -->
+
+                      
+                      
+                    </div>
+                  </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

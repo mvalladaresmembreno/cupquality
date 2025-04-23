@@ -1,0 +1,363 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/toggle-switch.css' %}">
+
+
+{% endblock %}
+
+{% block javascript %}
+<script src='https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js'></script>
+<script src="{% static 'scripts/registro.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    : Editar Muestra
+{% endblock %}
+
+{% block main %}
+<div class="container mt-3 w-75 rContenedor">
+  <div class="accordion border-0" id="accordionExample">
+      <div class="row align-items-end h-100 py-3 ">
+        <div class="col-12">
+          <p class="fs-3">Edición de Muestra</p>
+          <hr class="separator-form">
+        </div>
+      </div>
+      <div class="steps">
+          <progress id="progress" value=0 max=100 ></progress>
+          <div class="step-item">
+              <button class="step-button text-center shadow-none" type="button" data-toggle="collapse"
+                  data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="step1">
+                  1
+              </button>
+              <div class="step-title"></div>
+          </div>
+          <div class="step-item">
+              <button class="step-button text-center collapsed" type="button" data-toggle="collapse"
+                  data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" id="step2">
+                  2
+              </button>
+              <div class="step-title"></div>
+          </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+          <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+              data-parent="#accordionExample">
+              <div  id="headingOne" class="titleName">Origen de la muestra      
+              </div>
+              <div class="card-body">
+
+                  <!--Productor-->
+                  <div class="py-2 container h-100 col-12 col-md-11">
+                  <label class="form-label text-black" for="meta">Productor propietario de la muestra</label>
+                  <div class="input-group mb-3">
+                      <select class="form-select" id="productor" aria-label="Productor" name="productor" form="editMuestra" required>
+                          <option value="" default>Seleccione el Productor</option>
+                          {% for p in productores %}
+                            {% if p.idProd == muestra.fkLote.fkFinca.fkProd.idProd %}
+                              <option value="{{p.idProd}}" selected>{{p.firstnameProd}} {{p.lastnameProd}}</option>
+                            {% else %}
+                              <option value="{{p.idProd}}">{{p.firstnameProd}} {{p.lastnameProd}}</option>
+                            {% endif %}
+                          {% endfor %}
+                      </select>
+                  </div>
+                </div>
+
+                <!--Finca-->
+                <div class="py-2 container h-100 col-12 col-md-11">
+                  <label class="form-label text-black" for="meta">Nombre de la finca</label>
+                  <div class="input-group mb-3">
+                      <select class="form-select" id="finca" aria-label="Finca" name="finca" form="editMuestra" required>
+                          <option default>Seleccione la Finca</option>
+                          <option value="{{muestra.fkLote.fkFinca.idFinca}}" selected>{{muestra.fkLote.fkFinca.nameFinca}}</option>
+                      </select>
+                  </div>
+                </div>
+
+                <!--Proceso de la muestra-->
+                <div class="row py-2 container-flex h-100 col-12 col-md-11 mx-auto">
+                  <div class="col-12">
+                    <label for="meta" class="form-label text-black">Proceso de la muestra</label>
+                    <div class="row">
+                      
+                      <div class="col-4">
+                        <div class="form-check">
+                          <input form="editMuestra" class="form-check-input" name="procesadoMuestra" type="radio" id="lavado" value="1" {% if muestra.procesado == 1 %} checked {% endif %}>
+                          <label class="form-check-label" for="lavado">Lavado</label>
+                        </div>
+                      </div>
+                      
+                      <div class="col-4">
+                        <div class="form-check">
+                          <input form="editMuestra" class="form-check-input" name="procesadoMuestra"type="radio" id="natural" value="2" {% if muestra.procesado == 2 %} checked {% endif %}>
+                          <label class="form-check-label" for="natural">Natural</label>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div class="form-check">
+                          <input form="editMuestra" class="form-check-input" name="procesadoMuestra"type="radio" id="honey" value="3" {% if muestra.procesado == 3 %} checked {% endif %}>
+                          <label class="form-check-label" for="honey">Honey</label>
+                        </div>
+                      </div>
+                      
+                    </div>
+                  </div>  
+
+                </div>
+                
+                <div class="row py-2 container-flex h-100 col-12 col-md-11 mx-auto">
+                    <!--Ciclo agrícola de la muestra-->
+                    <div class="col-6">
+                        <label for="cicloAgricola" class="form-label text-black">Ciclo agrícola de la muestra</label>
+                        <div class="input-group mb-3">
+                        <select class="form-select" id="cicloAgricola" aria-label="cicloAgricola" name="cicloAgricola" form="editMuestra" required>
+                            <option value="" default>Seleccione el ciclo agrícola</option>
+                            {% if ciclos %}
+                                {% for c in ciclos %}
+                                <option value="{{ c.0 }}" {% if muestra.ciclo == c.0 %} selected {% endif %}> {{ c.1 }}</option>
+                                {% endfor %}  
+                            {% endif %}
+                        </select>
+                        </div>
+                    </div>
+
+                    <!--Fecha de entrega de la muestra-->
+                    <div class="col-6">
+                        <label class="form-label text-black" for="fechaEntregado">Fecha de entrega de la muestra</label>
+                        <div class="input-group mb-3">
+                            <input form="editMuestra" type="date" class="form-control" id="fechaEntregado" name="fechaEntregado" required value="{{fecha}}">
+                        </div>
+                    </div>
+
+                </div>
+                
+
+                <!--Next Button-->
+                <div class="d-grid  d-md-flex justify-content-md-end">
+                    <button class="btn btn-outline-warning me-md-2" type="button" onclick="clic2();">Siguiente</button>
+                </div>
+                
+              </div>
+          </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+          <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div  id="headingTwo" class="titleName">Aceptacion de la muestra
+            </div>
+            <div class="card-body">
+
+                <!--Lote-->
+                <div class="row py-2 container h-100 col-12 col-md-11 mx-auto">
+                  <div class="col-6">
+                    <label class="form-label text-black">Sede de Recepción</label>
+                    <div class="input-group mb-3">
+                        <select class="form-select" id="sRecepcion" aria-label="sedeRecepción" name="sRecepcion" form="editMuestra" required>
+                            <option value="" default>Seleccione sede</option>
+                            {% for s in sedes %}
+                              {% if muestra.sedeRecepcion == s %}
+                                <option value="{{s.id_sede}}" selected>{{s.name_sede}}</option>
+                              {% else %}
+                                <option value="{{s.id_sede}}">{{s.name_sede}}</option>
+                              {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label text-black" for="meta">Nombre o número de Lote</label>
+                    <div class="input-group mb-3">
+                        <select class="form-select" id="lote" aria-label="Lote" name="lote" form="editMuestra" required>
+                            <option value="" default>Seleccione Lote</option>
+                            <option value="{{muestra.fkLote.idLote}}" selected>{{muestra.fkLote.nameLote}}</option>
+                        </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row py-2 container h-100 col-12 col-md-11 mx-auto">
+                    <!--Tipo de muestra-->
+                    <div class="col-12">
+                      <label class="form-label text-black"for="">Tipo de muestra</label>
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="form-check">
+                            <input form="editMuestra" class="form-check-input" name="tMuestra" type="radio" id="oro" value="2" required {% if muestra.tipo == 2 %} checked {% endif %}>
+                            <label class="form-check-label" for="oro">Oro</label>
+                          </div>
+                        </div>
+                        
+                        <div class="col-4">
+                          <div class="form-check">
+                            <input form="editMuestra" class="form-check-input" name="tMuestra" type="radio" id="pergamino" value="1" required {% if muestra.tipo == 1 %} checked {% endif %}>
+                            <label class="form-check-label" for="pergamino">Pergamino</label>
+                          </div>
+                        </div>
+  
+                      </div>
+                    </div>
+                </div>
+
+                <!--Peso de la muestra-->
+                <div class="row py-4 container h-100 col-12 col-md-11 mx-auto">
+                    <div class="col">
+                        <label class="form-label text-black">Peso de la Muestra</label>
+                        <div class="row">
+                            <div class="col-3">
+                              <div class="form-check">
+                                <input form="editMuestra" class="form-check-input" name="pMuestra" type="radio" id="100" value="100" required {% if muestra.peso == '100' %} checked {% endif %}>
+                                <label class="form-check-label" for="100">100gr</label>
+                              </div>
+                            </div>
+                            
+                            <div class="col-3">
+                              <div class="form-check">
+                                <input form="editMuestra" class="form-check-input" name="pMuestra"type="radio" id="300" value="300" required {% if muestra.peso == '300' %} checked {% endif %}>
+                                <label class="form-check-label" for="300">300gr</label>
+                              </div>
+                            </div>
+
+                            <div class="col-3">
+                              <div class="form-check">
+                                <input form="editMuestra" class="form-check-input" name="pMuestra"type="radio" id="350" value="350" required {% if muestra.peso == '350' %} checked {% endif %}>
+                                <label class="form-check-label" for="350">350gr</label>
+                              </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="form-check">
+                                  <input form="editMuestra" class="form-check-input" name="pMuestra"type="radio" id="500" value="500" required {% if muestra.peso == '500' %} checked {% endif %}>
+                                  <label class="form-check-label" for="500">500gr</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Estado fisico de embalaje de muestra-->
+                <div class="row container py-2 h-100 col-12 col-md-11 mx-auto">
+                    <div class="col">
+                        <div class="row">
+                          <div class="col-12">
+                            <label class="form-label py-2 text-black">Estado físico del embalaje de Muestra</label>
+                            <div class="row">
+                              <div class="col-3">
+                                <div class="form-check">
+                                  <input form="editMuestra" class="form-check-input" type="checkbox" value="4" name="dEmbalaje" id="sBueno" {% if "Buen estado" in caracteristicas %} checked {% endif %}>
+                                  <label class="form-check-label" for="sBueno">Saco en buen estado</label>
+                                </div>
+                              </div>
+                              
+                              <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="editMuestra" class="form-check-input habilitador" type="checkbox" value="3" name="dEmbalaje" id="sRoto" {% if 'Empaque roto' in caracteristicas%} checked {% endif %}>
+                                    <label class="form-check-label " for="sRoto">Saco roto</label>
+                                  </div>
+                              </div>
+    
+                              <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="editMuestra" class="form-check-input habilitador" type="checkbox" value="2" name="dEmbalaje" id="sOlores" {% if 'Olor no característico' in caracteristicas %} checked {% endif %}>
+                                    <label class="form-check-label" for="sOlores">Saco con Olores</label>
+                                  </div>
+                              </div>
+    
+                              <div class="col-3">
+                                  <div class="form-check">
+                                    <input form="editMuestra" class="form-check-input habilitador" type="checkbox" value="1" name="dEmbalaje" id="sDerrames" {% if 'Derrame' in caracteristicas %} checked {% endif %}>
+                                    <label class="form-check-label" for="sDerrames">Saco con Derrames</label>
+                                  </div>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+
+                      
+                    </div>
+                </div>
+                
+                <!--Aceptacion de muestra-->
+                <div class="row py-2 container h-100 col-12 col-md-11 mx-auto">
+                    <!-- Switch -->
+                    <div class="col-6 py-2">
+                      <label class="form-check-label">¿Se rechaza la muestra?</label>
+                      <input form="editMuestra" type="hidden" name="aceptacionMuestra" value="0" id="aceptacionMuestra">
+                      <div class="div-switch">
+                          <input class="input" id="toggleAM" type="checkbox" {% if muestra.rMuestra == 1 %} checked {% endif %}>
+                              <label class="label" for="toggleAM">
+                                  <div class="left">
+                                      No
+                                  </div>
+                                  <div class="switch">
+                                      <span class="slider round slider-yellow round"></span>
+                                  </div>
+                                  <div class="right">
+                                      Si
+                                  </div>
+                              </label>
+                        </div>
+                      </div>
+                                          <!--Procesos a llevarse a cabo-->
+
+                    <div class="col-6 py-2 text-center">
+                      <label for="">Seleccione los procesos a realizarse en la muestra</label>
+                      <div class="row">
+                      <!--Analisis fisico-->
+                      <div class="col-6 text-center">
+                          <input type="checkbox" name="procesoMuestra" class="procesos" id="aFisico" form="editMuestra" value="1" {% if muestra.procesos == 1 or muestra.procesos == 3 %} checked {% endif %}>
+                          <label for="aFisico">
+                          <img id="iaFisico" class="buttonProcesos" src="{% static 'svg/coffee-beans.svg' %}"><br>
+                          Analisis Físico
+                          </label>
+                      </div>
+
+                      <!--Analisis sensorial-->
+                      <div class="col-6 text-center">
+                          <input type="checkbox" name="procesoMuestra" class="procesos" id="aSensorial" form="editMuestra" value="2" {% if muestra.procesos == 2 or muestra.procesos == 3 %} checked {% endif %}>
+                          <label for="aSensorial">
+                          <img id="iaSensorial" class="buttonProcesos" src="{% static 'svg/coffee-cup.svg' %}"> <br>
+                          Analisis Sensorial
+                          </label>
+                      </div>
+                      </div>
+                  
+                  </div>
+                    </div>
+
+
+                <!--Observaciones-->
+                <div class="row py-4 container h-100 col-12 col-md-11 mx-auto">
+                  <div class="col-12">
+                    <label for="observaciones" class="form-label text-black">Observaciones de la muestra</label>
+                    <textarea type="text" name="observaciones" class="form-control" id="observaciones" placeholder="Observaciones" rows="3" form="editMuestra">{{muestra.observaciones}}</textarea>
+                  </div>
+                </div>
+                </div>
+
+                <!--Buttons-->
+                <div class="d-grid  d-md-flex justify-content-md-end">
+
+                  <!--Back Button-->
+                  <button class="btn btn-outline-danger me-2" type="button" onclick="clic1();">Regresar</button>
+                  <!--Save Changes Button-->
+                  <button class="btn btn-outline-success me-2" type="submit" form="editMuestra">Guardar</button>
+                  
+                </div>
+                <form onsubmit="editMuestra(event, {{muestra.idMuestra}})" id="editMuestra">
+                  {% csrf_token %}
+                </form>
+            </div>
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}

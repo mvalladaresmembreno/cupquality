@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es-es">
+<head>
+    {% load static %}
+    {% load jsignature_filters %}
+    {% load get_tamizado %}
+    {% load get_defectos %}
+    {% load get_sabores_aromas %}
+    {% load utilidades %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="#">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- MDB -->
+    <link href="{% static 'css/mdb/mdb.min.css' %}" rel="stylesheet"/>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="{% static 'css/impresion.css' %}">
+    <link rel="stylesheet" href="{% static '/css/homeAnalisis.css' %}">
+    <link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+    {% block head_css %}
+    {% endblock %}
+    <title>Calidad de Taza: Resultados</title>
+</head>
+<body>
+    <header>
+        <div class="row d-flex justify-content-center align-items-center h-100 bg-transparent py-2 text-center">
+            <div class="col-4 text-center "><img class="bannerImg" src="{% static 'svg/solidaridad-logo-impresion.svg' %}" ></div>
+            <div class="col-4 text-center "></div>
+            <div class="col-4 text-center ">
+                <strong class="navbar-brand loggedoutnav">Calidad de Taza</strong>
+            </div>
+        </div>
+    </header>
+    <div class="container py-5">
+      <!--Fisico-->
+        <div class="container-fluid" id="fisico">
+          <!--Titulo del card-->
+          <div class="row">
+            <div class="col-12 text-center">
+              <h4>Analisis Fisico</h4>
+            </div>
+          </div>
+          <!--Inicia card fisico-->
+          <div class="container-fluid border-0 shadow-none">
+            <!--Primera parte del card-->
+            <div class="px-0 py-3 headerColor">
+              <div class="row justify-content-center align-content-center">
+                  <div class="col-2 text-center">
+                      <b>Muestra: {{ f.fkMuestra.idMuestra }}</b>
+                  </div>
+                  <div class="col-5 text-center" >
+                    <b>Peso Total Defectos: </b> {{f.pDefectos|floatformat:-2}} gr
+                  </div>
+                  <div class="col-5 text-center" >
+                      <b>Granos con Defectos: </b>{{f.porDefectos|floatformat:-2}} %</p>
+                  </div>
+              </div>
+            </div>
+            <!--Cuerpo del card-->
+            <div class="px-0 py-0" id="fisico-{{m.idMuestra}}-content">
+                <!--Tamizados-->
+                <div class="container py-3 px-0">
+
+                  <div class="row mb-2">
+                    <h6 class="text-start">Tamizados</h6>
+                  </div>
+                  <table class="table">
+                    <td scope="row">
+                      <td>Humedad: {{f.humedad}}</td>
+                      <td>Temp. Analisis: {{f.temp}}° </td>
+                      {% if f.fkMuestra.tipo == 1 %}
+                        <td>Rendimiento: {{f.rendimiento}}%</td>
+                      {% endif %}
+                    </td>
+                  </table>
+                  <table class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th scope="col">Determinación de Tamaños</th>
+                        <th scope="col">{{f.pesoTamiz|floatformat:"0"}}</th>
+                        <th scope="col">Retención</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Criba 20</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC20' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC20' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Criba 19</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC19' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC19' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Criba 18</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC18' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC18' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Criba 17</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC17' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC17' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Criba 16</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC16' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC16' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Criba 15</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC15' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC15' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Criba 14</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC14' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC14' }}</td>
+                      </tr>
+                      <tr>
+                        <td>Debajo de Criba 14</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC-14' }}</td>
+                        <td>{{ f.id| get_tamizado_peso:'PC-14' }}</td>
+                      </tr>
+                      <tr>
+                        <td>TOTAL</td>
+                        <td>{{f.pesoTotalTamiz}}</td>
+                        <td>{{f.porTotalTamiz}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+                <!--Defectos 1-->
+                <div class="py-3 px-0 col-12 finPag">
+                  <div class="row mb-2">
+                    <h6 class="text-start">Defectos tipo 1</h6>
+                  </div>
+                  <table class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th scope="col">Defecto</th>
+                        <th scope="col">Encontrados</th>
+                        <th scope="col"># Defectos</th>
+                        <th scope="col">Peso Imp. (gr)</th>
+                        <th scope="col">% Imperfecciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Negro Total</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='NGRT' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='NGRT' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='NGRT' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='NGRT' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Agrio Total</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='AGT' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='AGT' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='AGT' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='AGT' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Vaina/Cereza</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='VC' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='VC' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='VC' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='VC' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Piedras Grandes</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='PDRGR' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='PDRGR' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='PDRGR' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='PDRGR' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Piedras Medianas</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='PDRMD' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='PDRMD' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='PDRMD' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='PDRMD' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Palos Grandes</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='PLGR' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='PLGR' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='PLGR' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='PLGR' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Palos Medianos</td>
+                        <td>{% get_defecto_encontrados tipo='1' defecto='PLMD' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='1' defecto='PLMD' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='1' defecto='PLMD' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='1' defecto='PLMD' value=f.id %}</td>
+                      </tr>
+                      
+                      
+                    </tbody>
+                  </table>
+
+                </div>
+                <!--Defectos 2-->
+                <div class="py-3 px-0 col-12 nuevapagtop finPag">
+                  <div class="row mb-2">
+                    <h6 class="text-start">Defectos tipo 2</h6>
+                  </div>
+                  <table class="table table-bordered table-sm">
+                    <thead>
+                      <tr>
+                        <th scope="col">Defecto</th>
+                        <th scope="col">Encontrados</th>
+                        <th scope="col"># Defectos</th>
+                        <th scope="col">Peso Imp. (gr)</th>
+                        <th scope="col">% Imperfecciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Pergamino</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='PRG' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='PRG' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='PRG' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='PRG' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Cascara</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='CSCR' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='CSCR' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='CSCR' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='CSCR' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Roto/Astillado</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='RTAT' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='RTAT' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='RTAT' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='RTAT' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Daños por insectos</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='DPI' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='DPI' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='DPI' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='DPI' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Negro parcial</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='NGRP' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='NGRP' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='NGRP' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='NGRP' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Amargo parcial</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='AMGP' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='AMGP' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='AMGP' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='AMGP' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Flotador</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='FL' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='FL' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='FL' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='FL' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Concha</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='CNCH' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='CNCH' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='CNCH' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='CNCH' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Piedras pequeñas</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='PDRPQ' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='PDRPQ' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='PDRPQ' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='PDRPQ' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Palos pequeños</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='PLPQ' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='PLPQ' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='PLPQ' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='PLPQ' value=f.id %}</td>
+                      </tr>
+                      <tr>
+                        <td>Daños por agua</td>
+                        <td>{% get_defecto_encontrados tipo='2' defecto='DPA' value=f.id %}</td>
+                        <td>{% get_defecto_defectos tipo='2' defecto='DPA' value=f.id %}</td>
+                        <td>{% get_defecto_peso tipo='2' defecto='DPA' value=f.id %}</td>
+                        <td>{% get_defecto_por tipo='2' defecto='DPA' value=f.id %}</td>     
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div class="row flex-wrap text-center justify-content-center align-items-center">
+                    <div class="col-6 h-100">
+                      Exportable
+                      <p class="w-100 m-0">(%)</p>
+                      <div class="form-outline outlinenone border-bottom">
+                        <input type="text" class="form-control form-control-lg" readonly />
+                      </div>
+                    </div>
+                    <div class="col-6 h-100">
+                      Imperfecto
+                      <div class="row border">
+                        <div class="col-6 border px-0">
+                          <p class="border w-100 mb-0"> <strong>gr</strong> </p>
+                          <div class="form-outline outlinenone">
+                            <input type="text" class="form-control form-control-lg" readonly />
+                          </div>
+                        </div>
+                        <div class="col-6 border px-0">
+                          <p class="border w-100 mb-0"> <strong>%</strong> </p>
+                          <div class="form-outline">
+                            <input type="text" class="form-control form-control-lg" readonly />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6 h-100">
+                       Olfativo
+                      <div class="form-outline outlinenone border-bottom">
+                        <input type="text" class="form-control form-control-lg" readonly />
+                      </div>
+                    </div>
+                    <div class="col-6 h-100"> 
+                      Visual
+                      <div class="row border">
+                        <div class="col-4 border px-0">
+                          <p class="border w-100 mb-0"> <strong>Des. Botanica</strong> </p>
+                          <div class="form-outline outlinenone">
+                            <input type="text" class="form-control form-control-lg" readonly />
+                          </div>
+                        </div>
+                        <div class="col-4 border px-0">
+                          <p class="border w-100 mb-0"> <strong>Tipo</strong> </p>
+                          <div class="form-outline outlinenone">
+                            <input type="text" class="form-control form-control-lg" readonly />
+                          </div>
+                        </div>
+                        <div class="col-4 border px-0">
+                          <p class="border w-100 mb-0"> <strong>Color</strong> </p>
+                          <div class="form-outline outlinenone">
+                            <input type="text" class="form-control form-control-lg" readonly />
+                          </div>
+                        </div>
+                      </div>  
+                    </div>
+                  </div>
+                  <div class="row text-center justify-content-center align-items-center mt-5">
+                    <div class="col-6 border-bottom">
+                      Realizado por:
+                      <p>{{f.fkCatador.usuario.first_name}} {{f.fkCatador.usuario.last_name}}</p>
+                      
+                      {% if f.fkCatador.firma %}
+                      <img src="{{ f.fkCatador.firma|signature_base64 }}" alt="{{f.fkCatador.usuario.first_name}} {{f.fkCatador.usuario.last_name}}" width="50%">
+                      {% else %}
+                        <div class="form-outline outlinenone">
+                          <input type="text" class="form-control form-control-lg" readonly />
+                        </div>
+                      {% endif %}
+
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+        </div>
+      <!--Sensorial-->
+        <div class="container-fluid mt-3 " id="sensorial">
+          <div class="row mb-2 noprint">
+            <h6 class="text-start">Analisis Sensorial</h6>
+          </div>
+          <div class="container-fluid border-0 shadow-none px-0 py-2 aSensorial">
+            <div class="row mb-1 headerColor py-1 px-0">
+              <div class="col-2">
+                <strong>Muestra: {{ s.fkMuestra.idMuestra }}</strong>
+              </div>
+              <div class="col-5 row">
+                <div class="col-4 pt-0">
+                  <strong>Nivel de tueste: </strong>
+                </div>
+                <div class="col-8"> 
+                  <div class="range w-75">
+                    <input type="range" class="form-range" min="1" max="3" step="1" id="tueste-{{m.idMuestra}}" name="tueste" form="addSensorial-{{m.idMuestra}}" required value="{{s.nTueste}}" disabled/>
+                    <div class="row">
+                      <div class="col-4 text-start">B</div>
+                      <div class="col-4 text-center">M</div>
+                      <div class="col-4 text-end">A</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                  <strong>Agua (ml): {{s.cAgua}}</strong>
+              </div>
+              <div class="col-2">
+                <strong>Puntaje Final: <span id="puntajeFinal-{{m.idMuestra}}">{{s.pFinal}}</span></strong>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                <b>Fragancia</b>
+                <p>{{s.fragancia}}</p>
+              </div>
+              <div class="col-3">
+                <b>Sabor</b>
+                <p>{{s.pSabor}}</p>
+              </div>
+              <div class="col-3">
+                <b>Acidez</b>
+                <p>{{s.acidez}}</p>
+              </div>
+              <div class="col-3">
+                <b>Cuerpo</b>
+                <p>{{s.cuerpo}}</p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                <b>Seco</b>
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="seco-{{m.idMuestra}}" name="seco"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="{{s.seco}}" disabled/>
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                <b>Remanente</b>
+                <p>{{s.remanente}}</p>
+              </div>
+              <div class="col-3">
+                <b>Intensidad de Acidez</b>
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iAcido-{{m.idMuestra}}" name="iacidez"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="{{s.iAcidez}}" disabled/>
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                <b>Intensidad de Cuerpo</b>
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iCuerpo-{{m.idMuestra}}" name="icuerpo"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="{{s.iCuerpo}}" disabled/>
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                <b>Espuma</b>
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="Espuma-{{m.idMuestra}}" name="espuma"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="{{s.espuma}}" disabled/>
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                <b>Uniformidad</b>
+                <div class="row mb-3">
+                  {% for i in tazasList %}
+                    {% if i <= s.cUniformidad %}
+                      <div class="col-2">
+                        <input type="checkbox" class="tazas" id="cUniformidad-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                        <label for="cUniformidad-{{i}}-{{m.idMuestra}}">
+                          <img id="cUniformidad-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas uni change-color" src="{% static 'svg/taza.svg' %}">
+                          <br>
+                        </label>
+                      </div>
+                    {% else %}
+                      <div class="col-2">
+                        <input type="checkbox" class="tazas" id="cUniformidad-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                        <label for="cUniformidad-{{i}}-{{m.idMuestra}}">
+                          <img id="cUniformidad-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                          </label>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                  </div>
+                  <p>{{s.pUniformidad}}</p>
+                </div>
+              <div class="col-3">
+                <b>Taza Limpia</b>
+                <div class="row mb-3">
+                  {% for i in tazasList %}
+                  {% if i <= s.cTLimpia %}
+                    <div class="col-2">
+                      <input type="checkbox" class="tazas" id="cTLimpia-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                      <label for="cTLimpia-{{i}}-{{m.idMuestra}}">
+                        <img id="cTLimpia-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas tLmp change-color" src="{% static 'svg/taza.svg' %}"><br>
+                        </label>
+                    </div>
+                  {% else %}
+                    <div class="col-2">
+                      <input type="checkbox" class="tazas" id="cTLimpia-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                      <label for="cTLimpia-{{i}}-{{m.idMuestra}}">
+                        <img id="cTLimpia-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                        </label>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+                </div>
+                <p>{{s.pTLimpia}}</p>
+                
+              </div>
+              <div class="col-3">
+                <b>Dulzor</b>
+                <div class="row mb-3">
+                  {% for i in tazasList %}
+                  {% if i <= s.cDulzor %}
+                      <div class="col-2">
+                          <input type="checkbox" class="tazas" id="cDulzor-{{i}}-{{m.idMuestra}}" value="{{i}}" checked disabled>
+                          <label for="cDulzor-{{i}}-{{m.idMuestra}}">
+                          <img id="cDulzor-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas dlc change-color" src="{% static 'svg/taza.svg' %}"><br>
+                          </label>
+                      </div>
+                  {% else %}
+                      <div class="col-2">
+                          <input type="checkbox" class="tazas" id="cDulzor-{{i}}-{{m.idMuestra}}" value="{{i}}" disabled>
+                          <label for="cDulzor-{{i}}-{{m.idMuestra}}">
+                          <img id="cDulzor-btn-{{i}}-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                          </label>
+                      </div>
+                  {% endif %}
+                {% endfor %}
+                </div>
+                <p>{{s.pDulzor}}</p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                <b>Balance</b>
+                <p>{{s.balance}}</p>
+              </div>
+              <div class="col-3">
+                <b>Catador</b>
+                <p>{{s.pCatador}}</p>
+              </div>
+              <div class="col-3">
+                <b>Rechazo</b>
+                <p>{{s.castigo}}</p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-2">
+                  <p><b>Sabor</b></p>
+                </div>
+              
+                <div class="col-10 badgeSabor-{{m.idMuestra}}">
+                  {% for sabor in s.sabor.all %}
+                    <span class="badge rounded-pill badge-primary m-1">{{sabor.nameSabor}}</span>
+                  {% endfor %}
+                </div>
+
+            </div>
+            <div class="row mb-3">
+              <div class="col-2">
+                <p><b>Aroma</b></p>
+              </div>
+              
+              <div class="col-10 badgeAroma-{{m.idMuestra}}">
+                {% for aroma in s.aroma.all %}
+                  <span class="badge rounded-pill badge-warning m-1">{{aroma.nameAroma}}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-12">
+                  <b>Observaciones: </b> <br>
+                    {{s.comentario}}
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <footer>
+      <div class="text-center text-reset fw-bold footerResultados footerColor p-2">
+        © 2023 Copyright: Powered by Solidaridad Network
+      </div>
+    </footer>
+    <script src="{% static 'scripts/mdb/mdb.min.js' %}"></script>
+</body>
+</html>

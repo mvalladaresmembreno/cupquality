@@ -1,0 +1,1210 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/homeAnalisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'scripts/analisisLab.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    : Análisis Sensorial
+{% endblock %}
+
+{% block main %}
+<script>
+  var ids={{contM|safe}};
+</script>
+<div class="container py-5">
+  <div class="row mb-3">
+    <div class="col-6 text-start">
+      <h3>Análisis Sensorial</h3>
+    </div>
+  </div>
+  <div class="card border-0 shadow-none ms-5">
+      <!-- Tabs navs -->
+      <ul class="nav nav-tabs mb-3" id="muestras" role="tablist">
+        {% for m in muestras %}
+          {% if forloop.first %}
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="muestra-{{m.idMuestra}}" data-mdb-toggle="tab" href="#muestras-{{m.idMuestra}}" role="tab" aria-controls="muestras-{{m.idMuestra}}" aria-selected="true">Muestra {{m.idMuestra}}</a>
+          </li>
+          {% else %}
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="muestra-{{m.idMuestra}}" data-mdb-toggle="tab" href="#muestras-{{m.idMuestra}}" role="tab" aria-controls="muestras-{{m.idMuestra}}" aria-selected="false">Muestra {{m.idMuestra}}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <div class="tab-content" id="muestras-content">
+        {% for m in muestras %}
+          {% if forloop.first %}
+          <div class="tab-pane fade show active" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+            <div class="row align-items-center justify-content-center headerColor py-2 mb-3">
+                <div class="col-2">
+                    <strong>Muestra: {{ m.idMuestra }}</strong>
+                </div>
+                <div class="col-5 row">
+                  <div class="col-4 pt-3">
+                    <strong>Nivel de tueste: </strong>
+                  </div>
+                  <div class="col-8"> 
+                    <div class="range w-75">
+                      <input type="range" class="form-range" min="1" max="3" step="1" id="tueste-{{m.idMuestra}}" name="tueste" form="addSensorial-{{m.idMuestra}}" required value="2"/>
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                    <strong>Agua (ml)</strong>
+                    <input class="w-25" type="number" name="agua" id="Agua-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}" step="1" min="0" max="200" required value="0">
+                </div>
+                <div class="col-2">
+                  <strong>Puntaje Final: <span id="puntajeFinal-{{m.idMuestra}}">0.0</span></strong>
+                  <input type="hidden" name="pFinal" id="pFinal-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}" required value="0">
+                </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Fragancia
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Fragancia-{{m.idMuestra}}" name="fragancia" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+                
+              </div>
+              <div class="col-3">
+                Sabor
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Sabor-{{m.idMuestra}}" name="sabor" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+              <div class="col-3">
+                Acidez
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Acidez-{{m.idMuestra}}" name="acidez" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+              <div class="col-3">
+                Cuerpo
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Cuerpo-{{m.idMuestra}}" name="cuerpo" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Seco
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="seco-{{m.idMuestra}}" name="seco"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                Remanente
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Remanente-{{m.idMuestra}}" name="remanente" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+              <div class="col-3">
+                Intensidad de Acidez
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iAcido-{{m.idMuestra}}" name="iacidez"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                Intensidad de Cuerpo
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iCuerpo-{{m.idMuestra}}" name="icuerpo"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Espuma
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="Espuma-{{m.idMuestra}}" name="espuma"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                <!--pendiente revisar los values de cada checkbox-->
+                Uniformidad
+                <div class="row mb-3">
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-1-{{m.idMuestra}}" value="1">
+                    <label for="cUniformidad-1-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-1-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-2-{{m.idMuestra}}" value="2">
+                    <label for="cUniformidad-2-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-2-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-3-{{m.idMuestra}}" value="3">
+                    <label for="cUniformidad-3-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-3-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-4-{{m.idMuestra}}" value="4">
+                    <label for="cUniformidad-4-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-4-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-5-{{m.idMuestra}}" value="5">
+                    <label for="cUniformidad-5-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-5-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pUniformidad-{{m.idMuestra}}" name="pUniformidad" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                  <input type="hidden" data-muestra="{{m.idMuestra}}" name="cUniformidad" form="addSensorial-{{m.idMuestra}}" id="cUniformidad-{{m.idMuestra}}" value="0">
+                </div>
+              </div>
+              <div class="col-3">
+                <!--pendiente revisar los values de cada checkbox-->
+                Taza Limpia
+                <div class="row mb-3">
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-1-{{m.idMuestra}}" value="1" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-1-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-1-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-2-{{m.idMuestra}}" value="2" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-2-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-2-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-3-{{m.idMuestra}}" value="3" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-3-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-3-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-4-{{m.idMuestra}}" value="4" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-4-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-4-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-5-{{m.idMuestra}}" value="5" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-5-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-5-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pTLimpia-{{m.idMuestra}}" name="pTLimpia" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                  <input type="hidden" data-muestra="{{m.idMuestra}}" name="cTLimpia" form="addSensorial-{{m.idMuestra}}" id="cTLimpia-{{m.idMuestra}}" value="0">
+                </div>
+              </div>
+              <div class="col-3">
+                <!--pendiente revisar los values de cada checkbox-->
+                Dulzor
+                <div class="row mb-3">
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-1-{{m.idMuestra}}" value="1">
+                    <label for="cDulzor-1-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-1-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-2-{{m.idMuestra}}" value="2">
+                    <label for="cDulzor-2-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-2-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-3-{{m.idMuestra}}" value="3">
+                    <label for="cDulzor-3-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-3-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-4-{{m.idMuestra}}" value="4">
+                    <label for="cDulzor-4-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-4-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-5-{{m.idMuestra}}" value="5">
+                    <label for="cDulzor-5-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-5-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pDulzor-{{m.idMuestra}}" name="pDulzor" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                  <input type="hidden" data-muestra="{{m.idMuestra}}" name="cDulzor" form="addSensorial-{{m.idMuestra}}" id="cDulzor-{{m.idMuestra}}" value="0">
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Balance
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Balance-{{m.idMuestra}}" name="balance" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+              </div>
+              <div class="col-3">
+                Catador
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pCatador-{{m.idMuestra}}" name="pCatador" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+              </div>
+              <div class="col-3">
+                Rechazo
+                  <input type="number" data-muestra="{{m.idMuestra}}" id="castigo-{{m.idMuestra}}" name="castigo" class="form-control border-0 outlinenone w-50" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25" readonly/>
+                </div>
+                <div class="col-3">
+                  <div class="row ms-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="1"  data-muestra="{{m.idMuestra}}" id="-{{m.idMuestra}}" name="repetir" form="addSensorial-{{m.idMuestra}}"/>
+                      <label class="form-check-label" for="flexCheckDefault">Repetición</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-2">
+                  <p><b>Sabor</b></p>
+                </div>
+                <div class="col-1">
+                  <button type="button" class="btn modalButton btn-sm" data-mdb-toggle="modal" data-mdb-target="#saborModal-{{m.idMuestra}}">
+                    +
+                  </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="saborModal-{{m.idMuestra}}" data-mdb-backdrop="static" data-mdb-keyboard="false" tabindex="-1" aria-labelledby="saborModal-{{m.idMuestra}}" aria-hidden="true">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="saborModal-{{m.idMuestra}}">SABOR</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-3 py-5">
+                                  <h6>Selecciona el sabor elegido en la rueda exterior del diagrama</h6>
+                                  <div class="row mb-3">
+                                    <p><b>Nivel I</b></p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#saborModal-{{m.idMuestra}}" name="sabores" data-badge="badgeSabor-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <option value="dul" id="dul-{{m.idMuestra}}">Dulce</option>
+                                      <option value="ac" id="ac-{{m.idMuestra}}">Ácido</option>
+                                      <option value="sal" id="sal-{{m.idMuestra}}">Salado</option>
+                                      <option value="am" id="am-{{m.idMuestra}}">Amargo</option>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 1</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p><b>Nivel II</b></p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#saborModal-{{m.idMuestra}}" name="sabores" data-badge="badgeSabor-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Dulce">
+                                        <option value="dul-mel" id="dul-mel-{{m.idMuestra}}">Meloso</option>
+                                        <option value="dul-ac" id="dul-ac-{{m.idMuestra}}">Ácido (D)</option>
+                                      </optgroup>
+                                      <optgroup label="Acido">
+                                        <option value="ac-av" id="ac-av-{{m.idMuestra}}">Avinado</option>
+                                        <option value="ac-ag" id="ac-ag-{{m.idMuestra}}">Agrio</option>
+                                      </optgroup>
+                                      <optgroup label="Amargo">
+                                        <option value="am-pun" id="am-pun-{{m.idMuestra}}">Pungente</option>
+                                        <option value="am-as" id="am-as-{{m.idMuestra}}">Aspero</option>
+                                      </optgroup>
+                                      <optgroup label="Salado">
+                                        <option value="sal-af" id="sal-af-{{m.idMuestra}}">Afilado</option>
+                                        <option value="sal-sos" id="sal-sos-{{m.idMuestra}}">Soso</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 2</label>
+                                  </div>
+                                  <div class="row mb-5">
+                                    <p><b>Nivel III</b></p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#saborModal-{{m.idMuestra}}" name="sabores" data-badge="badgeSabor-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Dulce, Meloso">
+                                        <option value="dul-mel-del" id="dul-mel-del-{{m.idMuestra}}">Delicado</option>
+                                        <option value="d-m-equilibrado" id="d-m-equilibrado-{{m.idMuestra}}">Equilibrado</option>
+                                      </optgroup>
+                                      <optgroup label="Dulce, Acido">
+                                        <option value="dul-ac-li" id="dul-ac-li{{m.idMuestra}}">Ligero</option>
+                                        <option value="dul-ac-pi" id="dul-ac-pi-{{m.idMuestra}}">Picante</option>
+                                      </optgroup>
+                                      <optgroup label="Acido, Avinado">
+                                        <option value="ac-av-ta" id="ac-av-ta-{{m.idMuestra}}">Tanico</option>
+                                        <option value="ac-av-tar" id="ac-av-tar-{{m.idMuestra}}">Tartanico</option>
+                                      </optgroup>
+                                      <optgroup label="Acido, Agrio">
+                                        <option value="ac-ag-du" id="ac-ag-du-{{m.idMuestra}}">Duro</option>
+                                        <option value="ac-ag-acre" id="ac-ag-acre-{{m.idMuestra}}">Acre</option>
+                                      </optgroup>
+                                      <optgroup label="Amargo, Pungente">
+                                        <option value="am-pun-cr" id="am-pun-cr-{{m.idMuestra}}">Creosol</option>
+                                        <option value="am-pun-fen" id="am-pun-fen-{{m.idMuestra}}">Fenolico</option>
+                                      </optgroup>
+                                      <optgroup label="Amargo, Aspero">
+                                        <option value="am-as-cau" id="am-as-cau-{{m.idMuestra}}">Caustico</option>
+                                        <option value="am-as-alca" id="am-as-alca-{{m.idMuestra}}">Alcalino</option>
+                                      </optgroup>
+                                      <optgroup label="Salado, Afilado">
+                                        <option value="sal-af-ast" id="sal-af-ast-{{m.idMuestra}}">Astringente</option>
+                                        <option value="sal-af-asp" id="sal-af-asp-{{m.idMuestra}}">Aspero (S-A)</option>
+                                      </optgroup>
+                                      <optgroup label="Salado, Soso">
+                                        <option value="sal-sos-neu" id="sal-sos-neu-{{m.idMuestra}}">Neutro</option>
+                                        <option value="sal-sos-sua" id="sal-sos-sua-{{m.idMuestra}}">Suave</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 3</label>
+                                  </div>
+
+                                </div>
+                                <div class="col-9 py-2">
+                                  <div class="row justify-content-center align-items-center">
+                                    <img id="" class="imgComplete" src="{% static 'svg/sabores-completo.svg' %}">
+                                  </div>
+                                </div> 
+                              </div> 
+                            </div>
+        
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cerrar</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="col-9 badgeSabor-{{m.idMuestra}}">
+        
+                </div>
+
+              </div>
+              <div class="row mb-3">
+                <div class="col-2">
+                  <p><b>Fragancia/Aroma</b></p>
+                </div>
+                <div class="col-1">
+                  <button type="button" class="btn modalButton btn-sm" data-mdb-toggle="modal" data-mdb-target="#aromaModal-{{m.idMuestra}}">
+                    +
+                  </button>
+                  <!-- Modal -->
+                    <div class="modal fade" id="aromaModal-{{m.idMuestra}}" data-mdb-backdrop="static" data-mdb-keyboard="false" tabindex="-1" aria-labelledby="aromaModal-{{m.idMuestra}}" aria-hidden="true">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="aromaModal-{{m.idMuestra}}">FRAGANCIA</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-3 py-5">
+                                  <h6>Selecciona el sabor elegido en la rueda exterior del diagrama</h6>
+                                  <div class="row mb-3">
+                                    <p>Nivel I</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <option value="enzi" id="enzi-{{m.idMuestra}}">Enzimático</option>
+                                      <option value="az" id="az-{{m.idMuestra}}">Azúcar Tostada</option>
+                                      <option value="dest" id="dest-{{m.idMuestra}}">Destilación</option>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 1</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p>Nivel II</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Enzimático">
+                                        <option value="enzi-flo" id="enzi-flo-{{m.idMuestra}}">Floral</option>
+                                        <option value="enzi-fru" id="enzi-fru-{{m.idMuestra}}">Frutal</option>
+                                        <option value="enzi-herb" id="enzi-herb-{{m.idMuestra}}">Herbaceo</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada">
+                                        <option value="az-nu" id="az-nu-{{m.idMuestra}}">Nuez</option>
+                                        <option value="az-car" id="az-car-{{m.idMuestra}}">Caramelo</option>
+                                        <option value="az-cho" id="az-cho-{{m.idMuestra}}">Chocolate</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación">
+                                        <option value="dest-res" id="dest-res-{{m.idMuestra}}">Resinoso</option>
+                                        <option value="dest-pic" id="dest-pic-{{m.idMuestra}}">Picante</option>
+                                        <option value="dest-car" id="dest-car-{{m.idMuestra}}">Carbonil</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 2</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p>Nivel III</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Enzimático, Floral">
+                                        <option value="enzi-flo-fra" id="enzi-flo-fra-{{m.idMuestra}}">Fragante</option>
+                                        <option value="enzi-flo-flo" id="enzi-flo-flo-{{m.idMuestra}}">Floral (E-F)</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Frutal">
+                                        <option value="enzi-fru-ci" id="enzi-fru-ci-{{m.idMuestra}}">Citrico</option>
+                                        <option value="enzi-fru-ber" id="enzi-fru-ber-{{m.idMuestra}}">Berries</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Herbaceo">
+                                        <option value="enzi-herb-ali" id="enzi-herb-ali-{{m.idMuestra}}">Aliaceo</option>
+                                        <option value="enzi-herb-leg" id="enzi-herb-leg-{{m.idMuestra}}">Leguminoso</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Nuez">
+                                        <option value="az-nu-no" id="az-nu-no-{{m.idMuestra}}">Nogado</option>
+                                        <option value="az-nu-mal" id="az-nu-mal-{{m.idMuestra}}">Malteado</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Caramelo">
+                                        <option value="az-car-car" id="az-car-car-{{m.idMuestra}}">Caramelo (A-C)</option>
+                                        <option value="az-car-jar" id="az-car-jar-{{m.idMuestra}}">Jarabe</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Chocolate">
+                                        <option value="az-cho-cho" id="az-cho-cho-{{m.idMuestra}}">Chocolate (A-CH)</option>
+                                        <option value="az-cho-vai" id="az-cho-vai-{{m.idMuestra}}">Vainilla</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Resinoso">
+                                        <option value="dest-res-ter" id="dest-res-ter-{{m.idMuestra}}">Terpenico</option>
+                                        <option value="dest-res-med" id="dest-res-med-{{m.idMuestra}}">Medicinal</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Picante">
+                                        <option value="dest-pic-rec" id="dest-pic-rec-{{m.idMuestra}}">Recalentado</option>
+                                        <option value="dest-pic-pun" id="dest-pic-pun-{{m.idMuestra}}">Pungente</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Carbonil">
+                                        <option value="dest-car-ahu" id="dest-car-ahu-{{m.idMuestra}}">Ahumado</option>
+                                        <option value="dest-car-cen" id="dest-car-cen-{{m.idMuestra}}">Ceniza</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 3</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p>Nivel IV</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Enzimático, Floral, Floral">
+                                        <option value="enzi-flo-flo-jaz" id="enzi-flo-flo-jaz-{{m.idMuestra}}">Jazmin</option>
+                                        <option value="enzi-flo-flo-ver" id="enzi-flo-flo-ver-{{m.idMuestra}}">Verdes</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Floral, Fragante">
+                                        <option value="enzi-flo-fra-car" id="enzi-flo-fra-car-{{m.idMuestra}}">Cardamomo</option>
+                                        <option value="enzi-flo-fra-alb" id="enzi-flo-fra-alb-{{m.idMuestra}}">Albahaca Dulce</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Frutal, Citrico">
+                                        <option value="enzi-fru-ci-lim" id="enzi-fru-ci-lim-{{m.idMuestra}}">Limón</option>
+                                        <option value="enzi-fru-ci-tor" id="enzi-fru-ci-tor-{{m.idMuestra}}">Toronja</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Frutal, Berries">
+                                        <option value="enzi-fru-ber-fram" id="enzi-fru-ber-fram{{m.idMuestra}}">Frambuesa</option>
+                                        <option value="enzi-fru-ber-mora" id="enzi-fru-ber-mora-{{m.idMuestra}}">Mora</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Herbaceo, Aliaceo">
+                                        <option value="enzi-herb-ali-ceb" id="enzi-herb-ali-ceb-{{m.idMuestra}}">Cebolla</option>
+                                        <option value="enzi-herb-ali-ajo" id="enzi-herb-ali-ajo-{{m.idMuestra}}">Ajo</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Herbaceo, Leguminoso">
+                                        <option value="enzi-herb-leg-rep" id="enzi-herb-leg-rep-{{m.idMuestra}}">Repollo</option>
+                                        <option value="enzi-herb-leg-alf" id="enzi-herb-leg-alf-{{m.idMuestra}}">Alfalfa</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Nuez, Nogado">
+                                        <option value="az-nu-no-man" id="az-nu-no-man-{{m.idMuestra}}">Mani</option>
+                                        <option value="az-nu-no-al" id="az-nu-no-al-{{m.idMuestra}}">Almendra</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Nuez, Malteado">
+                                        <option value="az-nu-mal-ma" id="az-nu-mal-ma-{{m.idMuestra}}">Maiz</option>
+                                        <option value="az-nu-mal-ce" id="az-nu-mal-ce-{{m.idMuestra}}">Cebada</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Caramelo, Caramelo">
+                                        <option value="az-car-car-to" id="az-car-car-to-{{m.idMuestra}}">Toffee</option>
+                                        <option value="az-car-car-pra" id="az-car-car-pra-{{m.idMuestra}}">Praliné</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Caramelo, Jarabe">
+                                        <option value="az-car-jar-mi" id="az-car-jar-mi-{{m.idMuestra}}">Miel</option>
+                                        <option value="az-car-jar-mel" id="az-car-jar-mel-{{m.idMuestra}}">Melaza</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Chocolate, Chocolate">
+                                        <option value="az-cho-cho-pas" id="az-cho-cho-pas-{{m.idMuestra}}">Pasteleria</option>
+                                        <option value="az-cho-cho-gall" id="az-cho-cho-gall-{{m.idMuestra}}">Galleta Danesa</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Chocolate, Vainilla">
+                                        <option value="az-cho-vai-sui" id="az-cho-vai-sui-{{m.idMuestra}}">Suiza</option>
+                                        <option value="az-cho-vai-nat" id="az-cho-vai-nat-{{m.idMuestra}}">Natilla</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Resinoso. Terpenico">
+                                        <option value="dest-res-ter-pin" id="dest-res-ter-pin-{{m.idMuestra}}">Pino</option>
+                                        <option value="dest-res-ter-bal" id="dest-res-ter-bal-{{m.idMuestra}}">Balsámico</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Resinoso. Medicinal">
+                                        <option value="dest-res-med-alc" id="dest-res-med-alc-{{m.idMuestra}}">Alcantor</option>
+                                        <option value="dest-res-med-cin" id="dest-res-med-cin-{{m.idMuestra}}">Cinedílico</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Picante, Recalentado">
+                                        <option value="dest-pic-rec-nu" id="dest-pic-rec-nu-{{m.idMuestra}}">Nuez Moscada</option>
+                                        <option value="dest-pic-rec-pim" id="dest-pic-rec-pim-{{m.idMuestra}}">Pimienta</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Picante, Pungente">
+                                        <option value="dest-pic-pun-cla" id="dest-pic-pun-cla-{{m.idMuestra}}">Clavo de Olor</option>
+                                        <option value="dest-pic-pun-tom" id="dest-pic-pun-tom-{{m.idMuestra}}">Tomillo</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Carbonil, Ahumado">
+                                        <option value="dest-car-ahu-alq" id="dest-car-ahu-alq-{{m.idMuestra}}">Alquitrán</option>
+                                        <option value="dest-car-ahu-tab" id="dest-car-ahu-tab-{{m.idMuestra}}">Tabaco</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Carbonil, Ceniza">
+                                        <option value="dest-car-cen-que" id="dest-car-cen-que-{{m.idMuestra}}">Quemado</option>
+                                        <option value="dest-car-cen-carb" id="dest-car-cen-carb-{{m.idMuestra}}">Carbonizado</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 4</label>
+
+                                  </div>
+                                </div>
+                                <div class="col-9 py-2">
+                                  <div class="row justify-content-center align-items-center">
+                                    <img id="" class="imgComplete" src="{% static 'svg/aromas-completo.svg' %}">
+                                  </div>
+                                </div>
+                                
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="col-9 badgeAroma-{{m.idMuestra}}">
+        
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-12">
+                  <p>Observaciones</p>
+                    <textarea name="comentarios" id="comentarios" form="addSensorial-{{m.idMuestra}}" cols="30" rows="4"></textarea>
+                </div>
+              </div>
+              <div class="row px-0 justify-content-end align-items-end">
+                <div class="col-3 text-center doneButton px-0">
+                    <a id="save-{{m.idMuestra}}" href="javascript:void(0);" onclick="saveSensorial(event,{{m.idMuestra}});" class="btn my-0 py-0 w-100 px-0">
+                        <span class="fas fa-check compact" style="font-size: 2rem; color: white;"></span>
+                    </a>
+                    <form onsubmit="saveSensorial(event, {{m.idMuestra}})" id="addSensorial-{{m.idMuestra}}" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" name="idMuestra" value="{{m.idMuestra}}">
+                    </form>
+                </div> 
+            </div>
+          </div>
+          {% else %}
+          <div class="tab-pane fade" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+            <div class="row align-items-center justify-content-center headerColor py-2 mb-3">
+                <div class="col-2">
+                    <strong>Muestra: {{ m.idMuestra }}</strong>
+                </div>
+                <div class="col-5 row">
+                  <div class="col-4 pt-3">
+                    <strong>Nivel de tueste: </strong>
+                  </div>
+                  <div class="col-8"> 
+                    <div class="range w-75">
+                      <input type="range" class="form-range" min="1" max="3" step="1" id="tueste-{{m.idMuestra}}" name="tueste" form="addFisico-{{m.idMuestra}}" required value="2"/>
+                      <div class="row">
+                        <div class="col-4 text-start">B</div>
+                        <div class="col-4 text-center">M</div>
+                        <div class="col-4 text-end">A</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                    <strong>Agua (ml)</strong>
+                    <input class="w-25" type="number" name="agua" id="Agua-{{m.idMuestra}}" form="addFisico-{{m.idMuestra}}" step="1" min="0" max="200" required value="0">
+                </div>
+                <div class="col-2">
+                  <strong>Puntaje Final: <span id="puntajeFinal-{{m.idMuestra}}">0.0</span></strong>
+                  <input type="hidden" name="pFinal" id="pFinal-{{m.idMuestra}}" form="addFisico-{{m.idMuestra}}" required value="0">
+                </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Fragancia
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Fragancia-{{m.idMuestra}}" name="fragancia" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+                
+              </div>
+              <div class="col-3">
+                Sabor
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Sabor-{{m.idMuestra}}" name="sabor" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+              <div class="col-3">
+                Acidez
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Acidez-{{m.idMuestra}}" name="acidez" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+              <div class="col-3">
+                Cuerpo
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Cuerpo-{{m.idMuestra}}" name="cuerpo" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Seco
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="seco-{{m.idMuestra}}" name="seco"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                Remanente
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Remanente-{{m.idMuestra}}" name="remanente" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                </div>
+              </div>
+              <div class="col-3">
+                Intensidad de Acidez
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iAcido-{{m.idMuestra}}" name="iacidez"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                Intensidad de Cuerpo
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iCuerpo-{{m.idMuestra}}" name="icuerpo"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Espuma
+                <div class="range">
+                  <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="Espuma-{{m.idMuestra}}" name="espuma"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" />
+                  <div class="row">
+                    <div class="col-4 text-start">B</div>
+                    <div class="col-4 text-center">M</div>
+                    <div class="col-4 text-end">A</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-3">
+                <!--pendiente revisar los values de cada checkbox-->
+                Uniformidad
+                <div class="row mb-3">
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-1-{{m.idMuestra}}" value="1">
+                    <label for="cUniformidad-1-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-1-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-2-{{m.idMuestra}}" value="2">
+                    <label for="cUniformidad-2-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-2-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-3-{{m.idMuestra}}" value="3">
+                    <label for="cUniformidad-3-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-3-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-4-{{m.idMuestra}}" value="4">
+                    <label for="cUniformidad-4-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-4-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cUniformidad-5-{{m.idMuestra}}" value="5">
+                    <label for="cUniformidad-5-{{m.idMuestra}}">
+                      <img id="cUniformidad-btn-5-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pUniformidad-{{m.idMuestra}}" name="pUniformidad" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                  <input type="hidden" data-muestra="{{m.idMuestra}}" name="cUniformidad" form="addSensorial-{{m.idMuestra}}" id="cUniformidad-{{m.idMuestra}}" value="0">
+                </div>
+              </div>
+              <div class="col-3">
+                <!--pendiente revisar los values de cada checkbox-->
+                Taza Limpia
+                <div class="row mb-3">
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-1-{{m.idMuestra}}" value="1" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-1-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-1-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-2-{{m.idMuestra}}" value="2" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-2-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-2-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-3-{{m.idMuestra}}" value="3" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-3-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-3-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-4-{{m.idMuestra}}" value="4" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-4-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-4-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cTLimpia-5-{{m.idMuestra}}" value="5" data-muestra="{{m.idMuestra}}">
+                    <label for="cTLimpia-5-{{m.idMuestra}}">
+                      <img id="cTLimpia-btn-5-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pTLimpia-{{m.idMuestra}}" name="pTLimpia" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                  <input type="hidden" data-muestra="{{m.idMuestra}}" name="cTLimpia" form="addSensorial-{{m.idMuestra}}" id="cTLimpia-{{m.idMuestra}}" value="0">
+                </div>
+              </div>
+              <div class="col-3">
+                <!--pendiente revisar los values de cada checkbox-->
+                Dulzor
+                <div class="row mb-3">
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-1-{{m.idMuestra}}" value="1">
+                    <label for="cDulzor-1-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-1-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-2-{{m.idMuestra}}" value="2">
+                    <label for="cDulzor-2-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-2-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-3-{{m.idMuestra}}" value="3">
+                    <label for="cDulzor-3-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-3-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-4-{{m.idMuestra}}" value="4">
+                    <label for="cDulzor-4-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-4-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                  <div class="col-2">
+                    <input type="checkbox" class="tazas" id="cDulzor-5-{{m.idMuestra}}" value="5">
+                    <label for="cDulzor-5-{{m.idMuestra}}">
+                      <img id="cDulzor-btn-5-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-outline">
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pDulzor-{{m.idMuestra}}" name="pDulzor" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+                  <input type="hidden" data-muestra="{{m.idMuestra}}" name="cDulzor" form="addSensorial-{{m.idMuestra}}" id="cDulzor-{{m.idMuestra}}" value="0">
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                Balance
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="Balance-{{m.idMuestra}}" name="balance" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+              </div>
+              <div class="col-3">
+                Catador
+                  <input type="number" data-muestra="{{m.idMuestra}}" onkeyup="validate10(event);" id="pCatador-{{m.idMuestra}}" name="pCatador" class="form-control calculated" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25"/>
+              </div>
+              <div class="col-3">
+                Rechazo
+                  <input type="number" data-muestra="{{m.idMuestra}}" id="castigo-{{m.idMuestra}}" name="castigo" class="form-control border-0 outlinenone w-50" form="addSensorial-{{m.idMuestra}}" required value="0" max="10" min="0" step="0.25" readonly/>
+                </div>
+                <div class="col-3">
+                  <div class="row mb-2 ms-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="1"  data-muestra="{{m.idMuestra}}" id="-{{m.idMuestra}}" name="" form="addSensorial-{{m.idMuestra}}"/>
+                      <label class="form-check-label" for="flexCheckDefault">Conciliación</label>
+                    </div>
+                  </div>
+                  <div class="row ms-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="1"  data-muestra="{{m.idMuestra}}" id="-{{m.idMuestra}}" name="" form="addSensorial-{{m.idMuestra}}"/>
+                      <label class="form-check-label" for="flexCheckDefault">Repetición</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-2">
+                  <p><b>Sabor</b></p>
+                </div>
+                <div class="col-1">
+                  <button type="button" class="btn modalButton btn-sm" data-mdb-toggle="modal" data-mdb-target="#saborModal-{{m.idMuestra}}">
+                    +
+                  </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="saborModal-{{m.idMuestra}}" data-mdb-backdrop="static" data-mdb-keyboard="false" tabindex="-1" aria-labelledby="saborModal-{{m.idMuestra}}" aria-hidden="true">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="saborModal-{{m.idMuestra}}">SABOR</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-3 py-5">
+                                  <h6>Selecciona el sabor elegido en la rueda exterior del diagrama</h6>
+                                  <div class="row mb-3">
+                                    <p><b>Nivel I</b></p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#saborModal-{{m.idMuestra}}" name="sabores" data-badge="badgeSabor-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <option value="dul" id="dul-{{m.idMuestra}}">Dulce</option>
+                                      <option value="ac" id="ac-{{m.idMuestra}}">Acido</option>
+                                      <option value="sal" id="sal-{{m.idMuestra}}">Salado</option>
+                                      <option value="am" id="am-{{m.idMuestra}}">Amargo</option>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 1</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p><b>Nivel II</b></p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#saborModal-{{m.idMuestra}}" name="sabores" data-badge="badgeSabor-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Dulce">
+                                        <option value="dul-mel" id="dul-mel-{{m.idMuestra}}">Meloso</option>
+                                        <option value="dul-ac" id="dul-ac-{{m.idMuestra}}">Ácido (D)</option>
+                                      </optgroup>
+                                      <optgroup label="Acido">
+                                        <option value="ac-av" id="ac-av-{{m.idMuestra}}">Avinado</option>
+                                        <option value="ac-ag" id="ac-ag-{{m.idMuestra}}">Agrio</option>
+                                      </optgroup>
+                                      <optgroup label="Amargo">
+                                        <option value="am-pun" id="am-pun-{{m.idMuestra}}">Pungente</option>
+                                        <option value="am-as" id="am-as-{{m.idMuestra}}">Aspero</option>
+                                      </optgroup>
+                                      <optgroup label="Salado">
+                                        <option value="sal-af" id="sal-af-{{m.idMuestra}}">Afilado</option>
+                                        <option value="sal-sos" id="sal-sos-{{m.idMuestra}}">Soso</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 2</label>
+                                  </div>
+                                  <div class="row mb-5">
+                                    <p><b>Nivel III</b></p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#saborModal-{{m.idMuestra}}" name="sabores" data-badge="badgeSabor-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Dulce, Meloso">
+                                        <option value="dul-mel-del" id="dul-mel-del-{{m.idMuestra}}">Delicado</option>
+                                        <option value="d-m-equilibrado" id="d-m-equilibrado-{{m.idMuestra}}">Equilibrado</option>
+                                      </optgroup>
+                                      <optgroup label="Dulce, Acido">
+                                        <option value="dul-ac-li" id="dul-ac-li{{m.idMuestra}}">Ligero</option>
+                                        <option value="dul-ac-pi" id="dul-ac-pi-{{m.idMuestra}}">Picante</option>
+                                      </optgroup>
+                                      <optgroup label="Acido, Avinado">
+                                        <option value="ac-av-ta" id="ac-av-ta-{{m.idMuestra}}">Tanico</option>
+                                        <option value="ac-av-ta" id="ac-av-tar-{{m.idMuestra}}">Tartanico</option>
+                                      </optgroup>
+                                      <optgroup label="Acido, Agrio">
+                                        <option value="ac-ag-du" id="ac-ag-du-{{m.idMuestra}}">Duro</option>
+                                        <option value="ac-ag-acre" id="ac-ag-acre-{{m.idMuestra}}">Acre</option>
+                                      </optgroup>
+                                      <optgroup label="Amargo, Pungente">
+                                        <option value="am-pun-cr" id="am-pun-cr-{{m.idMuestra}}">Creosol</option>
+                                        <option value="am-pun-fen" id="am-pun-fen-{{m.idMuestra}}">Fenolico</option>
+                                      </optgroup>
+                                      <optgroup label="Amargo, Aspero">
+                                        <option value="am-as-cau" id="am-as-cau-{{m.idMuestra}}">Caustico</option>
+                                        <option value="am-as-alca" id="am-as-alca-{{m.idMuestra}}">Alcalino</option>
+                                      </optgroup>
+                                      <optgroup label="Salado, Afilado">
+                                        <option value="sal-af-ast" id="sal-af-ast-{{m.idMuestra}}">Astringente</option>
+                                        <option value="sal-af-asp" id="sal-af-asp-{{m.idMuestra}}">Aspero (S-A)</option>
+                                      </optgroup>
+                                      <optgroup label="Salado, Soso">
+                                        <option value="sal-sos-neu" id="sal-sos-neu-{{m.idMuestra}}">Neutro</option>
+                                        <option value="sal-sos-sua" id="sal-sos-sua-{{m.idMuestra}}">Suave</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 3</label>
+                                  </div>
+
+                                </div>
+                                <div class="col-9 py-2">
+                                  <div class="row justify-content-center align-items-center">
+                                    <img id="" class="imgComplete" src="{% static 'svg/sabores-completo.svg' %}">
+                                  </div>
+                                </div> 
+                              </div> 
+                            </div>
+        
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cerrar</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="col-9 badgeSabor-{{m.idMuestra}}">
+        
+                </div>
+
+              </div>
+              <div class="row mb-3">
+                <div class="col-2">
+                  <p><b>Fragancia/Aroma</b></p>
+                </div>
+                <div class="col-1">
+                  <button type="button" class="btn modalButton btn-sm" data-mdb-toggle="modal" data-mdb-target="#aromaModal-{{m.idMuestra}}">
+                    +
+                  </button>
+                  <!-- Modal -->
+                    <div class="modal fade" id="aromaModal-{{m.idMuestra}}" data-mdb-backdrop="static" data-mdb-keyboard="false" tabindex="-1" aria-labelledby="aromaModal-{{m.idMuestra}}" aria-hidden="true">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="aromaModal-{{m.idMuestra}}">FRAGANCIA</h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="col-3 py-5">
+                                  <h6>Selecciona el sabor elegido en la rueda exterior del diagrama</h6>
+                                  <div class="row mb-3">
+                                    <p>Nivel I</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <option value="enzi" id="enzi-{{m.idMuestra}}">Enzimático</option>
+                                      <option value="az" id="az-{{m.idMuestra}}">Azúcar Tostada</option>
+                                      <option value="dest" id="dest-{{m.idMuestra}}">Destilación</option>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 1</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p>Nivel II</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Enzimático">
+                                        <option value="enzi-flo" id="enzi-flo-{{m.idMuestra}}">Floral</option>
+                                        <option value="enzi-fru" id="enzi-fru-{{m.idMuestra}}">Frutal</option>
+                                        <option value="enzi-herb" id="enzi-herb-{{m.idMuestra}}">Herbaceo</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada">
+                                        <option value="az-nu" id="az-nu-{{m.idMuestra}}">Nuez</option>
+                                        <option value="az-car" id="az-car-{{m.idMuestra}}">Caramelo</option>
+                                        <option value="az-cho" id="az-cho-{{m.idMuestra}}">Chocolate</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación">
+                                        <option value="dest-res" id="dest-res-{{m.idMuestra}}">Resinoso</option>
+                                        <option value="dest-pic" id="dest-pic-{{m.idMuestra}}">Picante</option>
+                                        <option value="dest-car" id="dest-car-{{m.idMuestra}}">Carbonil</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 2</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p>Nivel III</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Enzimático, Floral">
+                                        <option value="enzi-flo-fra" id="enzi-flo-fra-{{m.idMuestra}}">Fragante</option>
+                                        <option value="enzi-flo-flo" id="enzi-flo-flo-{{m.idMuestra}}">Floral (E-F)</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Frutal">
+                                        <option value="enzi-fru-ci" id="enzi-fru-ci-{{m.idMuestra}}">Citrico</option>
+                                        <option value="enzi-fru-ber" id="enzi-fru-ber-{{m.idMuestra}}">Berries</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Herbaceo">
+                                        <option value="enzi-herb-ali" id="enzi-herb-ali-{{m.idMuestra}}">Aliaceo</option>
+                                        <option value="enzi-herb-leg" id="enzi-herb-leg-{{m.idMuestra}}">Leguminoso</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Nuez">
+                                        <option value="az-nu-no" id="az-nu-no-{{m.idMuestra}}">Nogado</option>
+                                        <option value="az-nu-mal" id="az-nu-mal-{{m.idMuestra}}">Malteado</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Caramelo">
+                                        <option value="az-car-car" id="az-car-car-{{m.idMuestra}}">Caramelo (A-C)</option>
+                                        <option value="az-car-jar" id="az-car-jar-{{m.idMuestra}}">Jarabe</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Chocolate">
+                                        <option value="az-cho-cho" id="az-cho-cho-{{m.idMuestra}}">Chocolate (A-CH)</option>
+                                        <option value="az-cho-vai" id="az-cho-vai-{{m.idMuestra}}">Vainilla</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Resinoso">
+                                        <option value="dest-res-ter" id="dest-res-ter-{{m.idMuestra}}">Terpenico</option>
+                                        <option value="dest-res-med" id="dest-res-med-{{m.idMuestra}}">Medicinal</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Picante">
+                                        <option value="dest-pic-rec" id="dest-pic-rec-{{m.idMuestra}}">Recalentado</option>
+                                        <option value="dest-pic-pun" id="dest-pic-pun-{{m.idMuestra}}">Pungente</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Carbonil">
+                                        <option value="dest-car-ahu" id="dest-car-ahu-{{m.idMuestra}}">Ahumado</option>
+                                        <option value="dest-car-cen" id="dest-car-cen-{{m.idMuestra}}">Ceniza</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 3</label>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <p>Nivel IV</p>
+                                    <select class="select disable-toggle-all" multiple data-mdb-container="#aromaModal-{{m.idMuestra}}" name="aromas" data-badge="badgeAroma-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}">
+                                      <optgroup label="Enzimático, Floral, Floral">
+                                        <option value="enzi-flo-flo-jaz" id="enzi-flo-flo-jaz-{{m.idMuestra}}">Jazmin</option>
+                                        <option value="enzi-flo-flo-ver" id="enzi-flo-flo-ver-{{m.idMuestra}}">Verdes</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Floral, Fragante">
+                                        <option value="enzi-flo-fra-car" id="enzi-flo-fra-car-{{m.idMuestra}}">Cardamomo</option>
+                                        <option value="enzi-flo-fra-alb" id="enzi-flo-fra-alb-{{m.idMuestra}}">Albahaca Dulce</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Frutal, Citrico">
+                                        <option value="enzi-fru-ci-lim" id="enzi-fru-ci-lim-{{m.idMuestra}}">Limón</option>
+                                        <option value="enzi-fru-ci-tor" id="enzi-fru-ci-tor-{{m.idMuestra}}">Toronja</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Frutal, Berries">
+                                        <option value="enzi-fru-ber-fram" id="enzi-fru-ber-fram{{m.idMuestra}}">Frambuesa</option>
+                                        <option value="enzi-fru-ber-mora" id="enzi-fru-ber-mora-{{m.idMuestra}}">Mora</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Herbaceo, Aliaceo">
+                                        <option value="enzi-herb-ali-ceb" id="enzi-herb-ali-ceb-{{m.idMuestra}}">Cebolla</option>
+                                        <option value="enzi-herb-ali-ajo" id="enzi-herb-ali-ajo-{{m.idMuestra}}">Ajo</option>
+                                      </optgroup>
+                                      <optgroup label="Enzimático, Herbaceo, Leguminoso">
+                                        <option value="enzi-herb-leg-rep" id="enzi-herb-leg-rep-{{m.idMuestra}}">Repollo</option>
+                                        <option value="enzi-herb-leg-alf" id="enzi-herb-leg-alf-{{m.idMuestra}}">Alfalfa</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Nuez, Nogado">
+                                        <option value="az-nu-no-man" id="az-nu-no-man-{{m.idMuestra}}">Mani</option>
+                                        <option value="az-nu-no-al" id="az-nu-no-al-{{m.idMuestra}}">Almendra</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Nuez, Malteado">
+                                        <option value="az-nu-mal-ma" id="az-nu-mal-ma-{{m.idMuestra}}">Maiz</option>
+                                        <option value="az-nu-mal-ce" id="az-nu-mal-ce-{{m.idMuestra}}">Cebada</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Caramelo, Caramelo">
+                                        <option value="az-car-car-to" id="az-car-car-to-{{m.idMuestra}}">Toffee</option>
+                                        <option value="az-car-car-pra" id="az-car-car-pra-{{m.idMuestra}}">Praliné</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Caramelo, Jarabe">
+                                        <option value="az-car-jar-mi" id="az-car-jar-mi-{{m.idMuestra}}">Miel</option>
+                                        <option value="az-car-jar-mel" id="az-car-jar-mel-{{m.idMuestra}}">Melaza</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Chocolate, Chocolate">
+                                        <option value="az-cho-cho-pas" id="az-cho-cho-pas-{{m.idMuestra}}">Pasteleria</option>
+                                        <option value="az-cho-cho-gall" id="az-cho-cho-gall-{{m.idMuestra}}">Galleta Danesa</option>
+                                      </optgroup>
+                                      <optgroup label="Azúcar Tostada, Chocolate, Vainilla">
+                                        <option value="az-cho-vai-sui" id="az-cho-vai-sui-{{m.idMuestra}}">Suiza</option>
+                                        <option value="az-cho-vai-nat" id="az-cho-vai-nat-{{m.idMuestra}}">Natilla</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Resinoso. Terpenico">
+                                        <option value="dest-res-ter-pin" id="dest-res-ter-pin-{{m.idMuestra}}">Pino</option>
+                                        <option value="dest-res-ter-bal" id="dest-res-ter-bal-{{m.idMuestra}}">Balsámico</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Resinoso. Medicinal">
+                                        <option value="dest-res-med-alc" id="dest-res-med-alc-{{m.idMuestra}}">Alcantor</option>
+                                        <option value="dest-res-med-cin" id="dest-res-med-cin-{{m.idMuestra}}">Cinedílico</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Picante, Recalentado">
+                                        <option value="dest-pic-rec-nu" id="dest-pic-rec-nu-{{m.idMuestra}}">Nuez Moscada</option>
+                                        <option value="dest-pic-rec-pim" id="dest-pic-rec-pim-{{m.idMuestra}}">Pimienta</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Picante, Pungente">
+                                        <option value="dest-pic-pun-cla" id="dest-pic-pun-cla-{{m.idMuestra}}">Clavo de Olor</option>
+                                        <option value="dest-pic-pun-tom" id="dest-pic-pun-tom-{{m.idMuestra}}">Tomillo</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Carbonil, Ahumado">
+                                        <option value="dest-car-ahu-alq" id="dest-car-ahu-alq-{{m.idMuestra}}">Alquitrán</option>
+                                        <option value="dest-car-ahu-tab" id="dest-car-ahu-tab-{{m.idMuestra}}">Tabaco</option>
+                                      </optgroup>
+                                      <optgroup label="Destilación, Carbonil, Ceniza">
+                                        <option value="dest-car-cen-que" id="dest-car-cen-que-{{m.idMuestra}}">Quemado</option>
+                                        <option value="dest-car-cen-carb" id="dest-car-cen-carb-{{m.idMuestra}}">Carbonizado</option>
+                                      </optgroup>
+                                    </select>
+                                    <label class="form-label select-label">Nivel 4</label>
+
+                                  </div>
+                                </div>
+                                <div class="col-9 py-2">
+                                  <div class="row justify-content-center align-items-center">
+                                    <img id="" class="imgComplete" src="{% static 'svg/aromas-completo.svg' %}">
+                                  </div>
+                                </div>
+                                
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="col-9 badgeAroma-{{m.idMuestra}}">
+        
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-12">
+                  <p>Observaciones</p>
+                    <textarea name="comentarios" id="comentarios" form="addSensorial-{{m.idMuestra}}" cols="30" rows="4"></textarea>
+                </div>
+              </div>
+              <div class="row px-0 justify-content-end align-items-end">
+                <div class="col-3 text-center doneButton px-0">
+                    <a id="save-{{m.idMuestra}}" href="javascript:void(0);" onclick="saveSensorial(event,{{m.idMuestra}});" class="btn my-0 py-0 w-100 px-0">
+                        <span class="fas fa-check compact" style="font-size: 2rem; color: white;"></span>
+                    </a>
+                    <form onsubmit="saveSensorial(event, {{m.idMuestra}})" id="addSensorial-{{m.idMuestra}}" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" name="idMuestra" value="{{m.idMuestra}}">
+                    </form>
+                </div> 
+            </div>
+          </div>
+          {% endif %}
+      {% endfor %}
+      </div>
+  </div>
+</div>
+{% endblock %}

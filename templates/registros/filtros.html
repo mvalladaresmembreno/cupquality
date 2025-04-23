@@ -1,0 +1,792 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/stats.css' %}">
+{% endblock %}
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0 "></script>
+<script src="{% static 'scripts/filtros.js' %}"></script>
+<script>
+    /*Sabores mas elegidos por nivel -- Sabor */
+    let sabnivel1= document.getElementById('SaborNivel1').getContext('2d');
+    let sabnivel2 = document.getElementById('SaborNivel2').getContext('2d');
+    let sabnivel3 = document.getElementById('SaborNivel3').getContext('2d');
+
+    /*Sabores mas elegidos por nivel -- Aroma */
+    let aromnivel1 = document.getElementById('AromaNivel1').getContext('2d');
+    let aromnivel2 = document.getElementById('AromaNivel2').getContext('2d');
+    let aromnivel3 = document.getElementById('AromaNivel3').getContext('2d');
+    let aromnivel4 = document.getElementById('AromaNivel4').getContext('2d'); 
+
+    let defectos1 = document.getElementById('DefectosTipo1').getContext('2d');
+    let defectos2 = document.getElementById('DefectosTipo2').getContext('2d'); 
+
+    let puntajeFinal = document.getElementById('PuntajesFinales').getContext('2d');
+    let puntajeAltitud = document.getElementById('PuntajesFinalesAltitud').getContext('2d');
+
+    let niveltueste = document.getElementById('NivelTueste').getContext('2d');
+
+    let chartSaborNivel1 = new Chart(sabnivel1,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Sabor1|safe}},
+                backgroundColor:["#2C3593", "#BF222E"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 1'
+                }
+            }
+        }
+    });
+
+    let chartSaborNivel2 = new Chart(sabnivel2,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Sabor2|safe}},
+                backgroundColor:["#95469A", "#EB6B6D", "#523F98"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 2'
+                }
+            }
+        }
+    });
+
+    let chartSaborNivel3 = new Chart(sabnivel3,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Sabor3|safe}},
+                backgroundColor:["#9CCB41", "#B34599", "#713D97", "#95469A"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 3'
+                }
+            }
+        }
+    });
+
+    let chartAromaNivel1 = new Chart(aromnivel1,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Aroma1|safe}},
+                backgroundColor:["#95469A"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 1'
+                }
+            }
+        }
+    });
+
+    let chartAromaNivel2 = new Chart(aromnivel2,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Aroma2|safe}},
+                backgroundColor:["#95469A"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 2'
+                }
+            }
+        }
+    });
+
+    let chartAromaNivel3 = new Chart(aromnivel3,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Aroma3|safe}},
+                backgroundColor:["#95469A"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 3'
+                }
+            }
+        }
+    });
+    
+    let chartAromaNivel4 = new Chart(aromnivel4,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{Aroma4|safe}},
+                backgroundColor:["#95469A"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.4,
+            parsing: 
+            {
+                xAxisKey: 'nameSabor',
+                yAxisKey: 'total'
+            },
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Nivel 4'
+                }
+            }
+        }
+    });
+
+    let chartDefectos1 = new Chart(defectos1,{
+        type: 'pie',
+        plugins: [ChartDataLabels],
+        data:{
+            labels: {{Defectos1.label|safe}},
+            datasets:[
+                {
+                label:"Actividades por Departamento",
+                data:{{Defectos1.data|safe}},
+                backgroundColor:["#E3252E", "#E0B03B", "#2490A8", "#D8E031"],
+                hoverOffset: 4,
+                datalabels: {
+                    anchor: 'center',
+                    backgroundColor: null,
+                    borderWidth: 0
+                }
+            }
+        ]
+            
+        },
+        options:{
+            responsive: true,
+            plugins:{
+                datalabels: {
+                    backgroundColor: function(context) {
+                        return context.dataset.backgroundColor;
+                    },
+                    borderColor: 'white',
+                    borderRadius: 25,
+                    borderWidth: 1,
+                    color: 'white',
+                    display: function(context) {
+                        var dataset = context.dataset;
+                        var count = dataset.data.length-(dataset.data.length);
+                        var value = dataset.data[context.dataIndex];
+                        return value > count * 1.5;
+                    },
+                    font: {
+                        size: '0',
+                        weight: 'bold'
+                    },
+                    padding: 6,
+                    formatter: Math.round
+                },
+                legend:{
+                    display: true,
+                    position: 'top'
+                },
+                title:{
+                    display: true,
+                    text: 'Defectos tipo 1'
+                }
+            }
+        }
+
+    });
+    let chartDefectos2 = new Chart(defectos2,{
+        type: 'pie',
+        plugins: [ChartDataLabels],
+        data:{
+            labels: {{Defectos2.label|safe}},
+            datasets:[
+                {
+                label:"Actividades por Departamento",
+                data:{{Defectos2.data|safe}},
+                backgroundColor:["#2C3593", "#EB4330", "#49B74B", "#CF258F"],
+                hoverOffset: 4,
+                datalabels: {
+                    anchor: 'center',
+                    backgroundColor: null,
+                    borderWidth: 0
+                }
+            }
+        ]
+            
+        },
+        options:{
+            responsive: true,
+            plugins:{
+                datalabels: {
+                    backgroundColor: function(context) {
+                        return context.dataset.backgroundColor;
+                    },
+                    borderColor: 'white',
+                    borderRadius: 25,
+                    borderWidth: 1,
+                    color: 'white',
+                    display: function(context) {
+                        var dataset = context.dataset;
+                        var count = dataset.data.length-(dataset.data.length);
+                        var value = dataset.data[context.dataIndex];
+                        return value > count * 1.5;
+                    },
+                    font: {
+                        size: '0',
+                        weight: 'bold'
+                    },
+                    padding: 6,
+                    formatter: Math.round
+                },
+                legend:{
+                    display: true,
+                    position: 'top'
+                },
+                title:{
+                    display: true,
+                    text: 'Defectos tipo 2'
+                }
+            }
+        }
+
+    });
+
+    let chartPuntajesFinales = new Chart(puntajeFinal,{
+        type:'bar',
+        data:{
+            datasets:[{
+                data:{{puntajesFinales|safe}},
+                backgroundColor:["#2C3593", "#BF222E"],
+            }],    
+        },
+        options: 
+        {
+            responsive:true,
+            maintainAspectRatio: false,
+            barPercentage:0.6,
+            
+            plugins: {      
+                legend: {
+                    display:false,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Puntajes Finales'
+                }
+            }
+        }
+    });
+
+    let chartPuntajesFinalesAltitud = new Chart(puntajeAltitud,{
+        type:'bar',
+        data:{
+            datasets:[
+            {
+                label:'800-1000',
+                data:{{alt1|safe}},
+                backgroundColor:["#2C3593",],
+            },            {
+                label:'1000-1200',
+                data:{{alt2|safe}},
+                backgroundColor:["#FFC800",],
+            },
+            {
+                label:'1200-1500',
+                data:{{alt3|safe}},
+                backgroundColor:["#45ea34",],
+            },
+            {
+                label:'1500+',
+                data:{{alt4|safe}},
+                backgroundColor:["#123123",],
+            },
+            
+        ],    
+        },
+        options: 
+        {
+            responsive:true,
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true
+                }
+            },
+            maintainAspectRatio: false,
+            barPercentage:0.8,
+            
+            plugins: {      
+                legend: {
+                    display:true,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Puntajes Finales'
+                }
+            }
+        }
+    });
+
+    let chartNivelTueste = new Chart(niveltueste,{
+        type: 'doughnut',
+        plugins: [ChartDataLabels],
+        data:{
+            labels: {{tueste.label|safe}},
+            datasets:[
+                {
+                label:"",
+                data:{{tueste.data|safe}},
+                backgroundColor:["#D8E031", "#CF258F"],
+                hoverOffset: 4,
+                datalabels: {
+                    anchor: 'center',
+                    backgroundColor: null,
+                    borderWidth: 0
+                }
+            }
+        ]
+            
+        },
+        options:{
+            responsive: true,
+            plugins:{
+                datalabels: {
+                    backgroundColor: function(context) {
+                        return context.dataset.backgroundColor;
+                    },
+                    borderColor: 'white',
+                    borderRadius: 25,
+                    borderWidth: 1,
+                    color: 'white',
+                    display: function(context) {
+                        var dataset = context.dataset;
+                        var count = dataset.data.length-(dataset.data.length);
+                        var value = dataset.data[context.dataIndex];
+                        return value > count * 1.5;
+                    },
+                    font: {
+                        size: '0',
+                        weight: 'bold'
+                    },
+                    padding: 6,
+                    formatter: Math.round
+                },
+                legend:{
+                    display: true,
+                    position: 'top'
+                },
+                title:{
+                    display: true,
+                    text: 'Nivel de Tueste'
+                }
+            }
+        }
+
+    });
+
+
+</script>
+{% endblock %}
+
+{% block title %}
+    : Filtro Avanzado
+{% endblock %}
+
+{% block main %}
+
+<aside class="filtros">
+    <div class="card shadow-0 rounded-0 mt-3 h-100">
+        <div class="card-body">
+            <div class="card-text border-start">
+                <div class="container-fluid">
+                    <div class="row">
+                        {% if user.is_authenticated %}
+                            {% if isAdmin or isBoss %}
+                                <div class="col-12 my-3">
+                                    <select form="filtros" name="cooperativas" class="select" multiple id="coop">
+                                        {% if cooperativas %}
+                                            {% for c in cooperativas %}
+                                                {% if not c.name_coop == 'TECNICO' %}
+                                                    <option value="{{c.id_coop}}"> {{c.name_coop}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                      </select>
+                                      <label class="form-label select-label">Cooperativa</label>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        <div class="col-12 my-3">
+                            <select form="filtros"  name="dptos" class="select" multiple id="departamento">
+                                {% if departamentos %}
+                                    {% for d in departamentos %}
+                                        <option value="{{d.idDpto}}"> {{d.nameDpto}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                              </select>
+                              <label class="form-label select-label">Departamentos</label>
+                        </div>
+                        <div class="col-12 my-3">
+                            <select form="filtros"  name="municipios" class="select" multiple id="municipio">
+                              </select>
+                              <label class="form-label select-label">Municipios</label>
+                        </div>
+
+                        <div class="col-12 my-3">
+                            <h5>Altitud</h5>
+                            <div class="form-check">
+                                <input form="filtros"  class="form-check-input" type="checkbox" name="altitud" value="800,1000" id="8001000" />
+                                <label class="form-check-label" for="8001000">800 - 1000</label>
+                            </div>
+                            <div class="form-check">
+                                <input form="filtros"  class="form-check-input" type="checkbox" name="altitud" value="1001,1200" id="10001200" />
+                                <label class="form-check-label" for="10001200">1000 - 1200</label>
+                             </div>
+                            <div class="form-check">
+                                <input form="filtros"  class="form-check-input" type="checkbox" name="altitud" value="1201,1500" id="12001500" />
+                                <label class="form-check-label" for="12001500">1200 - 1500</label>
+                            </div>
+                            <div class="form-check">
+                                <input form="filtros"  class="form-check-input" type="checkbox" name="altitud" value="1501" id="1500" />
+                                <label class="form-check-label" for="1500">1500+</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 my-3">
+                            <select form="filtros"  class="select" name="variedades" id="variedad" multiple>
+                            {% if variedades %}
+                                {% for v in variedades %}
+                                    <option value="{{v.id}}"> {{v.nameVariedad}}</option>
+                                {% endfor %}
+                            {% endif %}
+                            </select>
+                            <label class="form-label select-label">Variedades</label>
+                        </div>
+                        <div class="col-12 my-3">
+                            <select form="filtros"  class="select" name="certificaciones" id="certificacion" multiple>
+                                {% if certificaciones %}
+                                    {% for c in certificaciones %}
+                                        <option value="{{c.id}}"> {{c.nameCert}}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <label class="form-label select-label">Certificaciones</label>
+
+                        </div>
+                        <div class="col-12 my-3 text-center">
+                            <form onsubmit="filtrar(event);" method="post" id="filtros">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning btn-rounded">Aplicar</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+<div class="container h-auto my-auto mb-5">
+    <div class="row h-auto justify-content-center align-items-center">
+        <div class="col-12 text-center">
+            <h4 class="py-4">Información General</h4>
+        </div>
+    </div>
+    <!--Informacion general-->
+    <div class="row h-auto justify-content-center align-items-center">
+        <div class="col-2 text-center">
+            <h2 class="display-1">{{cRegistradas}}</h2>
+            <h6 class="pt-2">Muestras Registradas</h6>
+        </div>
+        <div class="col-2 text-center">
+            <h2 class="display-1">{{analizadas}}</h2>
+            <h6 class="pt-2">Muestras Analizadas</h6>
+        </div>
+        <div class="col-2 text-center">
+            <h2 class="display-1">{{cCompletadas}}</h2>
+            <h6 class="pt-2">Analisis Completados</h6>
+        </div>
+        <div class="col-2 text-center">
+            <h2 class="display-1">{{pAnalizar}}</h2>
+            <h6 class="pt-2">Analisis Pendientes</h6>
+        </div>
+        <div class="col-2 text-center">
+            <h2 class="display-1">{{pConciliar}}</h2>
+            <h6 class="pt-2">Conciliaciones Pendientes</h6>
+        </div>
+
+    </div>
+    <br><br><br>  
+    <!--Sabores mas elegidos por nivel-->
+    <div class="row h-auto justify-content-center align-items-center">
+        <div class="col-12 text-center">
+            <h4 class="py-4">Sabores más elegidos por nivel</h4>
+        </div>
+        <div class="col-12">
+            <ul class="nav nav-tabs mb-3 justify-content-center" id="ex1" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <a class="nav-link active" id="ex1-tab-1" data-mdb-toggle="tab" href="#ex1-tabs-1" role="tab" aria-controls="ex1-tabs-1" aria-selected="true">Sabor</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <a class="nav-link" id="ex1-tab-2" data-mdb-toggle="tab" href="#ex1-tabs-2" role="tab" aria-controls="ex1-tabs-2" aria-selected="true">Aroma</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="ex1-content">
+                <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel" aria-labelledby="ex1-tab-1">
+                    <div class="row">
+                        <div class="col-4">
+                            <!-- nivel 1 -->
+                            {% if Sabor1 %}
+                            <canvas id="SaborNivel1"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+                        </div>
+                        <div class="col-4">
+                            <!-- nivel 2 -->
+                            {% if Sabor2 %}
+                            <canvas id="SaborNivel2"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+                        </div>
+                        <div class="col-4">
+                            <!-- nivel 3 -->
+                            {% if Sabor3 %}
+                            <canvas id="SaborNivel3"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
+                    <div class="row">
+                        <div class="col-3">
+                            <!-- nivel 1 -->
+                            {% if Aroma1 %}
+                            <canvas id="AromaNivel1"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+                        </div>
+                        <div class="col-3">
+                            <!-- nivel 2 -->
+                            {% if Aroma2 %}
+                            <canvas id="AromaNivel2"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+                        </div>
+                        <div class="col-3">
+                            <!-- nivel 3 -->
+                            {% if Aroma3 %}
+                            <canvas id="AromaNivel3"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+                        </div>
+                        <div class="col-3">
+                            <!-- nivel 4 -->
+                            {% if Aroma4 %}
+                            <canvas id="AromaNivel4"></canvas>
+                            {% else %}
+                                <h2 class="display-5">No hay datos a mostrar</h2>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                    
+                </div>
+            </div> 
+        </div>
+    </div>
+    <br><br><br>  
+    <!--Defectos-->
+    <div class="row h-auto justify-content-center align-items-center">
+        <div class="col-12 text-center">
+            <h4>Defectos</h4>
+            <br>
+        </div>
+        <div class="col-4 text-center">
+            <h2 class="display-1">{{promDefectos|floatformat:-2}}%</h2>
+            <h6 class="pt-2">Porcentaje de Defectos</h6>
+        </div>
+        <div class="col-4">
+            <!-- Defectos 1 -->
+            {% if Defectos1.label and Defectos1.data %}
+                <canvas id="DefectosTipo1"></canvas>
+            {% else %}
+                <h2 class="display-5">No hay datos a mostrar</h2>
+            {% endif %}
+        </div>
+        <div class="col-4">
+            <!-- Defectos 1 -->
+            {% if Defectos2.label and Defectos2.data %}
+                <canvas id="DefectosTipo2"></canvas>
+            {% else %}
+                <h2 class="display-5">No hay datos a mostrar</h2>
+            {% endif %}
+        </div>
+    </div>
+    <!--Puntajes SCAA-->
+    <div class="row h-auto justify-content-center align-items-center">
+        <div class="col-12 text-center">
+            <br><br><br>
+            <h4>Puntajes SCAA</h4>
+            <br>
+        </div>
+        <div class="col-6">
+            <!-- puntajes finales -->
+            {% if puntajesFinales %}
+            <canvas id="PuntajesFinales"></canvas>
+            {% else %}
+                <h2 class="display-5">No hay datos a mostrar</h2>
+            {% endif %}  
+        </div>
+        <div class="col-6">
+            <!-- puntajes finales -->
+            {% if alt1 and alt2 and alt3 and alt4 %}
+            <canvas id="PuntajesFinalesAltitud"></canvas>
+            {% else %}
+                <h2 class="display-5">No hay datos a mostrar</h2>
+            {% endif %}  
+        </div>
+
+    </div>
+    <!--Puntajes por caracteristicas-->
+    <div class="row h-auto justify-content-center align-items-center">
+        <div class="col-12 text-center">
+            <br><br><br>
+            <h4>Puntajes por Caracteristicas</h4>
+            <br>
+        </div>
+        <div class="col-4 justify-content-center align-items-center">
+            <!--Nivel  de tueste-->
+            {% if tueste %}
+            <canvas id="NivelTueste"></canvas>
+            {% else %}
+                <h2 class="display-5">No hay datos a mostrar</h2>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

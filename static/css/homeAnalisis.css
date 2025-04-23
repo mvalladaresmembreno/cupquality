@@ -1,0 +1,48 @@
+.Acomp 
+{
+    background-color: #F0F5E6;
+}
+.Apend{
+    background-color: #F6F6F2;
+}
+.headerColor
+{
+    background-color: #C3C3C3;
+    color: black;
+}
+.buttonTazas
+{
+    width: 2.5rem;
+    height: 2.5rem;
+    filter: invert(69%) sepia(9%) saturate(0%) hue-rotate(169deg) brightness(93%) contrast(100%);
+}
+.change-color
+{
+    filter: invert(0%) sepia(90%) saturate(7429%) hue-rotate(243deg) brightness(84%) contrast(100%);
+}
+    
+.tazas{
+    display: none;
+}
+
+.outlinenone, .outlinenone:focus, .outlinenone:disabled{
+    box-shadow: inset 0 0 0 1px white !important;
+    border: none !important;
+    border-color: transparent !important;
+    outline-color: white !important;
+    background-color: white !important;
+  }
+
+.modalButton{
+    color: #FFFFFF;
+    background-color: #FFC800;
+}
+
+.imgComplete{
+    width: 65%;  
+    
+}
+
+.select-all-option {
+    display: none !important;
+}

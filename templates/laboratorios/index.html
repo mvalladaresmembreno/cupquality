@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load utilidades %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/stats.css' %}">
+
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}
+
+{% block title %}
+    : Inicio
+{% endblock %}
+
+{% block main %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="{% static '/scripts/home/chartsLab.js' %}"></script>
+<div class="container h-auto my-auto mb-5">
+    <div class="d-inline-flex p-2 py-3">
+        <h3>Estadisticas Generales</h3>
+    </div>
+    <div class="d-flex flex-row mb-3 justify-content-evenly flex-wrap">
+        <div class="p-2">
+            <select class="select" id="cPais" name="cPais">
+                <option value="" default>Codigo Pais</option>
+                {% for c in codigoPais %}
+                <option value="{{c.codigoPais}}">{{c.codigoPais}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="p-2">
+            <select class="select" id="cExp" name="cExp">
+                <option value="" default>Codigo Exportador</option>
+                {% for c in codigoExportador %}
+                <option value="{{c.exportador}}">{{c.exportador}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="p-2">
+            <select class="select" id="cLote" name="cLote">
+                <option value="" default>Codigo Lote</option>
+                {% for c in codigoLote %}
+                <option value="{{c.lote}}">{{c.lote}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="p-2">
+            <select class="select" id="cAgricola" name="cAgricola">
+                <option value="" default>Ciclo Agricola</option>
+                {% for c in ciclos %}
+                <option value="{{c.0}}">{{c.1}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="p-2">
+            <select class="select" multiple id="sabores" name="sabores">
+                {% for s in sabores %}
+                <option value="{{s.idSabor}}">{{s.nameSabor}}</option>
+                {% endfor %}
+              </select>
+              <label class="form-label select-label">Sabores</label>
+        </div>
+        <div class="p-2">
+            <select class="select" name="procesos" id="procesos">
+                <option value="" default>Procesado</option>
+                {% for p in procesos %}
+                <option value="{{p.0}}">{{p.1}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="p-2">
+            <button type="button" class="btn btn-warning" id="btnFiltrar">Aplicar</button>
+        </div>
+    </div>
+    <div class="d-flex flex-row mb-3 py-3 justify-content-evenly flex-wrap">
+        <div class="p-2">
+            <h3 class="text-center" id="TMR">#</h3>
+            <h6 class="pt-2">Total Muestras Registradas</h6>
+        </div>
+        <div class="p-2">
+            <h3 class="text-center" id="TMAF">#</h3>
+            <h6 class="pt-2">Total Muestras Analisis Fisico</h6>
+        </div>
+        <div class="p-2">
+            <h3 class="text-center" id="TMAS">#</h3>
+            <h6 class="pt-2">Total Muestras Analisis Sensorial</h6>
+        </div>
+        <div class="p-2">
+            <h3 class="text-center" id="PDTI">#</h3>
+            <h6 class="pt-2">% Defectos Tipo I</h6>
+        </div>
+        <div class="p-2">
+            <h3 class="text-center" id="PDTII">#</h3>
+            <h6 class="pt-2">% Defectos Tipo II</h6>
+        </div>
+    </div>
+    <div class="d-flex flex-row mb-3 py-2 justify-content-evenly ">
+        <div class="d-flex flex-column align-items-center col-2">
+            <div class="d-flex flex-row p-2 text-center">
+                <div class="p-2">
+                    <h3 class="text-center" id="PTM">#</h3>
+                    <h6 class="pt-2">Puntaje Minimo</h6>
+                </div>
+            </div>
+            <div class="d-flex flex-row p-2 text-center">
+                <div class="p-2">
+                    <h3 class="text-center" id="PPM">#</h3>
+                    <h6 class="pt-2">Puntaje Promedio</h6>
+                </div>
+            </div>
+            <div class="d-flex flex-row p-2 text-center">
+                <div class="p-2">
+                    <h3 class="text-center" id="PMAX">#</h3>
+                    <h6 class="pt-2">Puntaje Maximo</h6>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column col-4">
+            <canvas id="DTP">
+
+            </canvas>
+        </div>
+        <div class="d-flex flex-column align-items-center col-2">
+           
+            <canvas id="DTI">
+
+            </canvas>
+        </div>
+        <div class="d-flex flex-column align-items-center col-2">
+           
+            <canvas id="DTII">
+
+            </canvas>
+        </div>
+    </div>
+    <div class="d-flex flex-row mb-3 py-2 justify-content-evenly">
+        <div class="p-2 text-center col-4">
+          
+            <canvas id="MRCHZ">
+
+            </canvas>
+        </div>
+        <div class="p-2 text-center col-4">
+           
+            <canvas id="MTRCHZ">
+                
+            </canvas>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

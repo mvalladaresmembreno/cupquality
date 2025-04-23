@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/orden.css' %}">
+<link rel="stylesheet" href="{% static '/css/lote.css' %}">
+
+{% endblock %}
+
+{% block javascript %}
+<!-- https://listjs.com/ -->
+<script src="{% static 'scripts/list.min.js' %}"></script>
+<script src="{% static 'scripts/lote.js' %}"></script>
+{% if finca %}
+<script>
+    openModal("openLoteModal");
+</script>
+{% endif %}
+{% endblock %}
+
+{% block title %}
+    : Lotes
+{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+    <div class="col-6 text-start">
+        <p class="fs-2">Lotes</p>
+    </div> 
+    <div class="row justify-content-start align-items-end h-100 py-3">
+        <div class="col-6 text-start">
+            <div class="input-group mb-3 w-50">
+                <input class="form-control" type="search" id="Search" placeholder="Busqueda" autocomplete="off">
+            </div>
+        </div> 
+        <div class="col-6 text-end">
+            <button type="button" class="btn btn-dark" data-mdb-toggle="modal" data-mdb-target="#addLote" id="openLoteModal">
+                + Crear Lote
+            </button>
+              <!-- Modal https://mdbootstrap.com/docs/standard/components/modal/#! -->
+            <div class="modal fade"  data-mdb-backdrop="static" data-mdb-keyboard="false" id="addLote" tabindex="-1" aria-labelledby="addLoteLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addLoteLabel">CREAR LOTE</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    
+                        <div class="modal-body text-start">
+                            <!--Lote x Lote-->
+                            <form action="{% url 'addLote' %}" method="post">
+                                {% csrf_token %}
+                            <div class=" row justify-content-center align-items-center h-100">
+                                <div class="col">
+                                    <label class="form-label text-black" for="finca">Finca</label>
+                                    <div class="input-group mb-3">
+                                        <select class="form-select " id="finca" aria-label="Finca" name="finca" required>
+                                            <option value="">Seleccione la Finca</option>
+                                              {% for prod in productores %}
+                                                  <optgroup label="{{prod.firstnameProd}} {{prod.lastnameProd}}">
+                                                      {% for f in fincas %}
+                                                          {% if f.fkProd.idProd == prod.idProd %}
+                                                                  <option {% if finca %} {% if finca.idFinca == f.idFinca %} selected {% endif %} {% endif %} value="{{f.idFinca}}">{{f.nameFinca}}</option>
+                                                          {% endif %}
+                                                      {% endfor %}
+                                                  </optgroup>
+                                              {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                              </div>  
+                            <!--Nombre Lote-->  
+                            <div class=" row justify-content-start align-items-center h-100">
+                                <div class="col-12">
+                                    <label class="form-label text-black" for="nameLote">Nombre del Lote</label>
+                                    <div class="input-group mb-3">
+                                        <input class="form-control" type="text" id="nameLote" name="nameLote" placeholder="Nombre del Lote" value="" required autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Variedades Sembradas-->
+                            <div class=" row justify-content-start align-items-center h-100 mb-2">
+                                <div class="col-12">
+                                <label class= "form-label text-black" for="vars">Variedades Sembradas del Lote</label>
+                                    <div class="">
+                                        <select id="multiSelection" class="select" multiple name="vars">
+                                            {% for v in variedades %}
+                                            <option value="{{v.id}}">{{v.nameVariedad}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <div class="row justify-content-start align-items-center h-100 mb-2">
+                                <!--Area Lote-->
+                                <div class="col-6">
+                                    <label class="form-label text-black" for="areaLote">Area</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="w-75"name="areaLote" id="areaLote" step="0.01" required aria-describedby="unidadLote">
+                                        <span class="input-group-text" id="unidadLote">Ha</span>
+                                    </div>
+                                </div>
+                                <!--Altitud--> 
+                                <div class="col-6">
+                                    <label class="form-label text-black" for="altitudLote">Altitud</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="w-75" name="altitudLote" id="altitudLote" step="0.01" required aria-describedby="m">
+                                        <span class="input-group-text" id="m">m</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Certificaciones del lote-->
+                            <div class=" row justify-content-start align-items-center h-100 mb-2">
+                                <div class="col-12">
+                                    <label class= "form-label text-black" for="certificaciones">Certificaciones del Lote</label>
+                                    <div class=" ">
+                                        <select id="multiSelection" class="select" multiple name="certs">
+                                            {% for c in certificaciones %}
+                                            <option value="{{c.id}}">{{c.nameCert}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn savebtn">GUARDAR</button>
+                        </div>
+                            </form>                     
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- TABLA PROD -->
+    <div id="table-list">
+        <table class="table table-striped table-hover text-center" id="tblSearch">
+            <thead class="table-dark">
+              <tr id="tableHeader">
+                <th scope="col" class="sort" data-sort="name">Nombre del Lote</th>
+                <th scope="col" class="sort" data-sort="area">Area del Lote</th>
+                <th scope="col" class="sort" data-sort="alt">Altitud del Lote</th>
+                <th scope="col" class="sort" data-sort="vars">Variedades Sembradas</th>
+                <th scope="col" class="sort" data-sort="certs">Certificaciones del Lote</th>
+                {% if isAdmin or isBoss %}
+                <th scope="col">Opciones</th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody class="list">
+                {% if lotes %}
+                    {% for l in lotes %}
+                    <tr id="l-{{l.idLote}}" class="align-middle">
+                        <td scope="row" class="name" id="name-{{l.idLote}}">{{l.nameLote}}</td>
+                        <td class="area" id="area-{{l.idLote}}">{{l.area|floatformat:-2}}</td>
+                        <td class="alt" id="altitud-{{l.idLote}}">{{l.altitud}}</td>
+                        <td class="vars" id="vars-{{l.idLote}}">
+                            <ul class="comma-list" id="varList-{{l.idLote}}">
+                                {% for v in l.fkVar.all %}
+                                    <li>{{v.nameVariedad}}</li>
+                                {% endfor %}
+                            </ul>
+                           
+                        </td>
+                        <td class="certs" id="certs-{{l.idLote}}">
+                            <ul class="comma-list" id="certList-{{l.idLote}}">
+                                {% for c in l.fkCert.all %}
+                                <li>
+                                    {{c.nameCert}}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            
+                        </td>
+                        {% if isAdmin or isBoss %}
+                        <td class="justify-content-center align-items-center">
+                            <button class="col-5 btn btn-floating btn-danger text-light fas fa-trash-alt" type="submit" form="delete-{{l.idLote}}"></button>
+                            <button type="button" class=" col-5 btn btn-floating savebtn fas fa-edit ms-xxl-3 mt-2 mt-xxl-auto" data-mdb-toggle="modal" data-mdb-target="#updateLote-{{l.idLote}}"> </button>
+                            <!-- Modal https://mdbootstrap.com/docs/standard/components/modal/#! -->
+                            <div class="modal fade" data-mdb-backdrop="static" data-mdb-keyboard="false" id="updateLote-{{l.idLote}}" tabindex="-1" aria-labelledby="updateLote-{{l.idLote}}-Label" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="updateLote-{{l.idLote}}-Label">EDITAR LOTE</h5>
+                                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close" id="close-{{l.idLote}}"></button>
+                                    </div>
+                                    
+                                        <div class="modal-body text-start">
+                                        <form onsubmit="updateLote(event, {{l.idLote}});" method="post" id="update-{{l.idLote}}">
+                                            {% csrf_token %}
+                                            <div class=" row justify-content-center align-items-center h-100">
+                                                <div class="col-12">
+                                                    <label class="form-label text-black" for="finca">Finca</label>
+                                                    <div class="input-group mb-3">
+                                                        <select class="form-select " id="finca" aria-label="Finca" name="finca" required>
+                                                            <option value="">Seleccione la Finca</option>
+                                                              {% for prod in productores %}
+                                                                  <optgroup label="{{prod.firstnameProd}} {{prod.lastnameProd}}">
+                                                                      {% for f in fincas %}
+                                                                          {% if f.fkProd.idProd == prod.idProd %}
+                                                                            {% if f.idFinca == l.fkFinca.idFinca %}
+                                                                                <option selected value="{{f.idFinca}}">{{f.nameFinca}}</option>
+                                                                            {% else %}
+                                                                                <option value="{{f.idFinca}}">{{f.nameFinca}}</option>
+                                                                            {% endif %}
+                                                                          {% endif %}
+                                                                      {% endfor %}
+                                                                  </optgroup>
+                                                              {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label text-black" for="nameLote">Nombre de la Lote</label>
+                                                    <div class="input-group mb-3">
+                                                        <input class="form-control" type="text" id="nameLote" name="nameLote" placeholder="Nombre de la Lote" value="{{l.nameLote}}" required autocomplete="off">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--Variedades Sembradas-->
+                                            <div class=" row justify-content-start align-items-center h-100 mb-2">
+                                                <div class="col-12">
+                                                <label class= "form-label text-black" for="vars">Variedades Sembradas del Lote</label>
+                                                    <div class="mb-3">
+                                                        <select id="multiSelection" class="select" multiple name="vars">
+                                                            {% for v in variedades %}
+                                                                {% if v in l.fkVar.all %}
+                                                                    <option value="{{v.id}}" selected>{{v.nameVariedad}}</option>
+                                                                {% else %}
+                                                                    <option value="{{v.id}}">{{v.nameVariedad}}</option>   
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                            <div class="row justify-content-start align-items-center h-100 mb-2">
+                                                <!--Area Lote-->
+                                                <div class="col-6">
+                                                    <label class="form-label text-black" for="areaLote">Area</label>
+                                                    <div class="input-group mb-3">
+                                                        <input type="number" class="w-75"name="areaLote" id="areaLote" step="0.01" value="{{l.area|floatformat:-2}}" required aria-describedby="area-{{l.idLote}}">
+                                                        <span class="input-group-text" id="area-{{l.idLote}}">{{l.unidad}}</span>
+                                                    </div>
+                                                </div>
+                                                <!--Altitud--> 
+                                                <div class="col-6">
+                                                    <label class="form-label text-black" for="altitudLote">Altitud</label>
+                                                    <div class="input-group mb-3">
+                                                        <input type="number" class="w-75" name="altitudLote" id="altitudLote" step="0.01" value="{{l.altitud|floatformat:-2}}" required aria-describedby="m">
+                                                        <span class="input-group-text" id="m">m</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--Certificaciones del lote-->
+                                            <div class=" row justify-content-start align-items-center h-100 mb-2">
+                                                <div class="col-12">
+                                                <label class= "form-label text-black" for="certificaciones">Certificaciones del Lote</label>
+                                                    <div class="mb-3">
+                                                        <select id="multiSelection" class="select" multiple name="certs">
+                                                            {% for c in certificaciones %}
+                                                                {% if c in l.fkCert.all %}
+                                                                <option value="{{c.id}}" selected>{{c.nameCert}}</option>
+                                                                {% else %}
+                                                                    <option value="{{c.id}}">{{c.nameCert}}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn savebtn">ACTUALIZAR </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form onsubmit="rmLote(event, {{l.idLote}});" method="POST" id="delete-{{l.idLote}}">
+                                {% csrf_token %}
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                {% else %}
+              <tr>
+                <td colspan="6">NO HAY DATOS QUE MOSTRAR</td>
+              </tr>
+              {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+{% endblock %}

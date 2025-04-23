@@ -1,0 +1,188 @@
+<div class="step-item">
+    <button class="step-button text-center" type="button" data-toggle="collapse"
+        data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="step1">
+        1
+    </button>
+    <div class="step-title"></div>
+</div>
+
+
+<!--Step 5-->
+
+<div class="step-item">
+    <button class="step-button text-center" type="button" data-toggle="collapse"
+        data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="step1">
+        1
+    </button>
+    <div class="step-title"></div>
+</div>
+
+
+<!--Objetivos del analisis-->
+<div class="card border-0 shadow-sm">
+          
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+        data-parent="#accordionExample">
+        <div id="headingOne" class="titleName">Objetivos del analisis</div>
+        <hr class="separator-analisis"></hr>
+        <div class="card-body">
+
+            <!--Objetivos del analisis - radiobuttons-->
+            <div class="py-2 container h-100 col-12 col-md-11">
+                <div class="col">
+                    <label class="form-label text-black">Seleccione el objetivo del analisis</label>
+                    <div class="row">
+                        <div class="col-6">
+                          <div class="form-check">
+                            <input form="analizeM" class="form-check-input" name="oAnalisis" type="radio" id="sCooperativa">
+                            <label class="form-check-label" for="sCooperativa">Seguimento cooperativa</label>
+                          </div>
+                        </div>
+                        
+                        <div class="col-6">
+                          <div class="form-check">
+                            <input form="analizeM" class="form-check-input" name="oAnalisis"type="radio" id="sProductor">
+                            <label class="form-check-label" for="sProductor">Solicitud del productor</label>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                          <div class="form-check">
+                            <input form="analizeM" class="form-check-input" name="oAnalisis" type="radio" id="concurso">
+                            <label class="form-check-label" for="concurso">Concurso</label>
+                          </div>
+                        </div>
+                        
+                        <div class="col-6">
+                          <div class="form-check">
+                            <input form="analizeM" class="form-check-input" name="oAnalisis"type="radio" id="sComprador">
+                            <label class="form-check-label" for="sComprador">Solicitud del comprador</label>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+
+           
+
+            <!--Next Button-->
+            <div class="d-grid  d-md-flex justify-content-md-end">
+                <button class="btn btn-outline-warning me-md-2" type="button" onclick="clic2();">Siguiente</button>
+            </div>
+          
+        </div>
+    </div>
+</div>
+
+
+
+<!--Puntajes finales --- 5-->      
+<div class="card border-0 shadow-sm">
+    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
+        <div  id="headingFive" class="titleName">Puntajes Finales</div>
+        <hr class="separator-analisis">
+        <div class="card-body">
+
+            <!-- TABLA PROD -->
+            <div id="table-list">
+                <table class="table table-striped table-hover text-center">
+                    <thead class="table-dark">
+                      <tr>
+                        <th scope="col" class="sort" data-sort="codigo">Codigo de muestra</th>
+                        <th scope="col"class="sort" data-sort="catador">Nombre del Catador</th>
+                        <th scope="col" class="sort" data-sort="fCatacion">Fecha de la Catacion</th>
+                        <th scope="col" class="sort" data-sort="pFinal">Puntaje final</th>
+                        <th scope="col">Definir</th>
+                      </tr>
+                    </thead>
+                    <tbody class="list">
+                        {% if muestras %}
+                            {% for m in muestras %}
+                            <tr id="m-{{m.idMuestra}}" class="align-middle text-center">
+                                <th scope="row" class="codigo" id="codigo-{{m.idMuestra}}">{{m.idMuestra}}</th>
+                                
+                                <td class="humedad" id="humedad-{{m.idMuestra}}">{{m.pHumedad|floatformat:-2}} %</td>
+                                <td class="rendimiento" id="rendimiento-{{m.idMuestra}}">{{m.pRendimiento|floatformat:-2}} %</td>
+                                <td class="fecha" id="fecha-{{m.idMuestra}}">{{m.fechaEntrega}}</td>
+                                <td class="analizar">
+
+                                      <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#cFinal-{{m.idMuestra}}">Ver detalles</button>
+                                    
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="cFinal-{{m.idMuestra}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="aroma-{{m.idMuestra}}Label" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="cFinal-{{m.idMuestra}}-Label">Modal title</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <table class="table">
+                                                    <thead>
+                                                      <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">First</th>
+                                                        <th scope="col">Last</th>
+                                                        <th scope="col">Handle</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      <tr>
+                                                        <th scope="row">1</th>
+                                                        <td>Mark</td>
+                                                        <td>Otto</td>
+                                                        <td>@mdo</td>
+                                                      </tr>
+                                                      <tr>
+                                                        <th scope="row">2</th>
+                                                        <td>Jacob</td>
+                                                        <td>Thornton</td>
+                                                        <td>@fat</td>
+                                                      </tr>
+                                                      <tr>
+                                                        <th scope="row">3</th>
+                                                        <td colspan="2">Larry the Bird</td>
+                                                        <td>@twitter</td>
+                                                      </tr>
+                                                    </tbody>
+                                                  </table>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary">Understood</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                      <tr>
+                        <td colspan="6">NO HAY DATOS QUE MOSTRAR</td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+          
+
+          <!--Buttons-->
+          <div class="d-grid  d-md-flex justify-content-md-end">
+
+            <!--Back Button-->
+            <button class="btn btn-outline-danger me-2" type="button" onclick="clic4();">Regresar</button>
+            <!--1st Step-->
+            <button class="btn btn-outline-warning me-2" type="button" onclick="clic1();">Primer Paso</button>
+            <!--Save Changes Button-->
+            <button class="btn btn-outline-success me-2" type="submit" form="addMuestra">Guardar</button>
+            
+          </div>
+          <form onsubmit="saveMuestra(event)" id="addMuestra"></form>
+        </div>
+    </div>
+</div>

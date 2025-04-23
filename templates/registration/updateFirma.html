@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jsignature_filters %}
+{% block head_css %}
+{% endblock %}
+
+{% block javascript %}
+<script
+  src="https://code.jquery.com/jquery-3.6.1.slim.min.js"
+  integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA="
+  crossorigin="anonymous"></script>
+    {{ firma.media }}
+{% endblock %}
+
+
+{% block title %}
+    : Mi Perfil
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5 w-75 rContenedor">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Nombre completo</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.usuario.first_name}} {{usuario.usuario.last_name}} </p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Dirección de correo electrónico</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.usuario.email}}</p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {{firma}}
+                        <input type="submit" value="Guardar" class="btn btn-success" />
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

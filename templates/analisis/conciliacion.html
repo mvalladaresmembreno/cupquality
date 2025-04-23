@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load utilidades %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/conciliacion.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'scripts/conciliacion.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    : Conciliación
+{% endblock %}
+
+{% block main %}
+    <div class="container py-5 ps-sm-5">
+        <input type="hidden" name="idMuestra" id="idMuestra" value="{{muestra}}">
+        <div class="row justify-content-center align-items-center" id="CMuestra-{{muestra}}">
+            <div class="col-8 my-3">
+                <div class="card text-center">
+                  <div class="card-header text-start">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>ID Muestra:</strong> {{muestra}}
+                        </div>
+                    </div>
+                  </div>            
+                  <div class="card-body">
+                    <form id="conciliacion-{{muestra}}">
+                        {% csrf_token %}
+                        <input type="hidden" name="muestra" value="{{muestra}}">
+                    </form>
+                    <table class="table table-striped table-hover table-sm text-center align-middle">
+                        <thead class="table-dark">
+                          <tr>
+                            <th scope="col">Criterio</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                  <th scope="col"> {{s.fkCatador.usuario.first_name}} {{s.fkCatador.usuario.last_name}}</th>
+                                {% endfor %}
+                            {% endif %}
+                            <th scope="col">Puntuaciones
+
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">Aroma</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.fragancia}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="aroma" type="number" id="aroma-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Sabor</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.pSabor}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="sabor" type="number" id="sabor-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Remanente</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.remanente}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="remanente" type="number" id="remanente-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Acidez</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.acidez}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="acidez" type="number" id="acidez-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Cuerpo</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.cuerpo}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="cuerpo" type="number" id="cuerpo-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Balance</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.balance}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="balance" type="number" id="balance-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Uniformidad</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.pUniformidad}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="uniformidad" type="number" id="uniformidad-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Taza Limpia</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.cTLimpia}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="tLimpia" type="number" id="tLimpia-{{muestra}}" class="form-control text-center" min="0" max="5" step='1' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Dulzor</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.pDulzor}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="dulzor" type="number" id="dulzor-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Catador</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.pCatador}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="pSensorial" type="number" id="pSensorial-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Tazas Def.</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{ s.cTLimpia|restar }}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <div class="form-outline">
+                                    <input name="tDefectuosas" type="number" id="tDefectuosas-{{muestra}}" class="form-control text-center" min="0" max="10" step='1' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required/>
+                                    
+                                  </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Intensidad</th>
+                            {% if sensoriales %}
+                                {% for s in sensoriales %}
+                                <td>{{s.getIntensidad}}</td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                              <select class="form-select" id="intensidad-{{muestra}}" name="intensidad" form="conciliacion-{{muestra}}" onchange="calculate({{muestra}});" required>
+                                <option value="">Seleccciona un nivel</option>  
+                                <option value="1" selected>Alto</option>
+                                <option value="2">Medio</option>
+                                <option value="3">Bajo</option>
+                              </select>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row">Puntaje Final</th>
+                                {% if sensoriales %}
+                                    {% for s in sensoriales %}
+                                    <td>{{s.pFinal}}</td>
+                                    {% endfor %}
+                                {% endif %}
+                                <td>
+                                    <div class="form-outline">
+                                        <input name="pFinal" type="number" id="pFinal-{{muestra}}" class="form-control text-center" min="0" max="10" step='0.01' value="0" onchange="calculate({{muestra}});" form="conciliacion-{{muestra}}" required readonly/>
+                                        
+                                      </div>
+                                </td>
+                              </tr>
+                        </tfoot>
+                      </table>
+                </div>
+                  <div class="card-footer text-center">
+                      <button onclick="saveConciliacion(event,'{{muestra}}');" class="btn btn-dark" id="saveCon-{{muestra}}">Guardar</button>
+                  </div>
+                </div>
+            </div> 
+            {% if not sensoriales %}
+            <div class="card alert-danger py-3"> 
+                <div class="card-body text-center">
+                  Ooops, no hay info que mostrar. 
+                </div> 
+              </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,130 @@
+/* the interesting bit */
+
+.label {
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+  
+  .switch,
+  .input:checked + .label .left,
+  .input:not(:checked) + .label .right {
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .div-switch{
+    padding-top: 1rem;
+  }
+   .input {
+    display: none;
+  }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+  }
+  
+  input:checked + .label .slider {
+    background-color: #FFC800;
+  }
+  
+  input:focus + .label .slider {
+    box-shadow: 0 0 1px #FFC800;
+  }
+  
+  input:checked + .label .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  
+  /* styling to make it look like your screenshot */
+  
+  .left, .right {
+    margin: 0.5em;
+  }  
+
+
+
+  /* Colors */
+  .slider-yellow {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: lightgray;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider-yellow:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider-yellow {
+    background-color: #FFC800;
+  }
+  
+  input:focus + .slider-yellow {
+    box-shadow: 0 0 1px #FFC800;
+  }
+  
+  input:checked + .slider-yellow:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider-yellow.round {
+    border-radius: 34px;
+  }
+  
+  .slider-yellow.round:before {
+    border-radius: 50%;
+  }

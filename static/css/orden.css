@@ -1,0 +1,83 @@
+/* Change the Table Cursor to Pointer */
+.table [data-sort] {
+    cursor: pointer;
+}
+/* This is for the sort up and down icon */
+.table [data-sort]::after {
+    margin-left: .25rem;
+    content: url('data:image/svg+xml;utf8,<svg width=\'6\' height=\'10\' viewBox=\'0 0 6 10\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'><path fill-rule=\'evenodd\' clip-rule=\'evenodd\' d=\'M3 0L6 4H0L3 0ZM3 10L0 6H6L3 10Z\' fill=\'%238898aa\'/></svg>');
+}
+
+input[type="number"], textarea {
+    width: 88%;
+    border: solid 0.5px rgb(189,189,189) ;
+    border-radius: 5px;
+    
+ }
+ input[type="number"]:focus , textarea:focus {
+    border-color: transparent;
+    animation-timing-function: ease;
+    animation-duration: 85ms;
+    animation-fill-mode: forwards;
+    animation-name: focusin;
+ }
+ @keyframes focusin {
+    0% {
+        outline: solid 1px rgb(18,102,241);
+    }
+    20%{
+        outline: solid 1.5px rgb(18,102,241);
+    }
+    40%{
+        outline: solid 2px rgb(18,102,241);
+    }
+    60%{
+        outline: solid 3px rgb(18,102,241);
+    }
+    100% {
+        outline: solid 2px rgb(18,102,241);
+    } 
+}
+
+/* @keyframes hide {
+    0% {
+        opacity: 1;
+        height: 100%;
+        line-height: 100%;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+    75% {
+        opacity: 0;
+        height: 50%;
+        line-height: 50%;
+        padding: 10px;
+        margin-bottom: 5px;
+        border-bottom-width: 0px;
+    }
+    100% {
+        opacity: 0;
+        height: 0px;
+        line-height: 0px;
+        padding: 0px;
+        margin-bottom: 0px;
+    }
+}
+
+tr {
+    animation-name: hide;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+} */
+
+.accordion-button, .accordion-button:not(.collapsed)
+{
+    background-color: #2c2c2c;
+    color: #fff;
+}
+
+.accordion-button::after
+{
+    filter: invert(100%) sepia(60%) saturate(2%) hue-rotate(152deg) brightness(108%) contrast(101%);
+}

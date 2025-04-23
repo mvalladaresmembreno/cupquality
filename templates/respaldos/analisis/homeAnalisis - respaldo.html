@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/homeAnalisis.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static '/scripts/hAnalisis.js'%}"></script>
+{% endblock %}
+
+{% block title %}
+    : Muestras
+{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+  <div class="row mb-3">
+    <div class="col-6 text-start">
+      <h3>Sesiones de Analisis</h3>
+    </div>
+    <div class="col-6 text-end">
+
+        <button type="button" class="btn btn-dark" data-mdb-toggle="modal" data-mdb-target="#addAnalisisModal">
+          + Crear Analisis
+        </button>
+
+        <div class="modal fade" data-mdb-backdrop="static" data-mdb-keyboard="false" id="addAnalisisModal" tabindex="-1" aria-labelledby="addAnalisisModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addAnalisisModalLabel">Agregar sesión de análisis</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="container-fluid">
+                      <div class="row justify-content-start align-items-center h-100 mb-2">
+                          <div class="col-6 text-start">
+                                <label class="form-label text-black" for="fechaAnalisis">Fecha de Realización</label>
+                                <div class="input-group mb-3">
+                                    <input class="form-control fechaHoy" form="addAnalisis" type="date" id="fechaAnalisis" name="fechaAnalisis" max="" required>
+                                </div>
+                          </div>
+                          <div class="col-6 text-start">
+                            <label class="form-label text-black" for="oAnalisis">Objetivo del Análisis</label>
+                            <div class="input-group mb-3">
+                                <select class="form-select" form="addAnalisis" id="oAnalisis" aria-label="oAnalisis" name="oAnalisis" required>
+                                    <option value="" default>Seleccione el Objetivo</option>
+                                    {% for o in objetivos %}
+                                        <option value="{{ o.0 }}">{{ o.1 }}</option>
+                                    {% endfor %}                                            
+                                </select>
+                            </div>
+                          </div>
+                      </div>
+                      <div class="row justify-content-start align-items-center h-100 mb-2">
+                        <div id="table-list">
+                          <table class="table table-striped table-hover text-center">
+                              <thead class="table-dark">
+                                <tr>
+                                  <th scope="col" class="sort" data-sort="codigo">Codigo</th>
+                                  <th scope="col"class="sort" data-sort="peso">Peso</th>
+                                  <th scope="col" class="sort" data-sort="humedad">% Humedad</th>
+                                  <th scope="col" class="sort" data-sort="rendimiento">% Rendimiento</th>
+                                  <th scope="col" class="sort" data-sort="fecha">Fecha Entrega</th>
+                                  <th scope="col">Analizar</th>
+                                </tr>
+                              </thead>
+                              <tbody class="list">
+                                  {% if muestras %}
+                                      {% for m in muestras %}
+                                      <tr id="m-{{m.idMuestra}}" class="align-middle text-center">
+                                          <th scope="row" class="codigo" id="codigo-{{m.idMuestra}}">{{m.idMuestra}}</th>
+                                          <td class="peso" id="peso-{{m.idMuestra}}">{{m.peso|floatformat:-2}}gr</td>
+                                          <td class="humedad" id="humedad-{{m.idMuestra}}">{{m.pHumedad|floatformat:-2}} %</td>
+                                          <td class="rendimiento" id="rendimiento-{{m.idMuestra}}">{{m.pRendimiento|floatformat:-2}} %</td>
+                                          <td class="fecha" id="fecha-{{m.idMuestra}}">{{m.fechaEntrega}}</td>
+                                          <td class="analizar">
+                                                  <input class="form-check-input" form="addAnalisis" type="checkbox" value="{{m.idMuestra}}" name="aMuestra">
+                                          </td>
+                                      </tr>
+                                      {% endfor %}
+                                  {% else %}
+                                <tr>
+                                  <td colspan="6">NO HAY DATOS QUE MOSTRAR</td>
+                                </tr>
+                                {% endif %}
+                              </tbody>
+                          </table>
+                      </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-mdb-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-warning" form="addAnalisis">Agregar</button>
+              </div>
+              <form action="{% url 'homeAnalisis' %}" method="POST" id="addAnalisis">
+                {% csrf_token %}
+              </form>
+            </div>
+          </div>
+        </div> 
+    </div>
+  </div>
+
+    {% if analisis %}
+    <div class="row justify-content-start align-items-center h-100 mb-2">
+      {% for a in analisis%}
+        {% if a.estado == 1 %}
+          <div class="col-4">
+            <div class="card Acomp text-center mb-4">
+                <h5 class="card-header">ID: {{a.id}}</h5>
+                <div class="card-body">
+                    <p class="card-title "> <strong>Estado: </strong> {{a.getEstado}}</p>
+                    <p class="card-text"> <strong>Objetivo: </strong> {{a.getObjetivo}}</p>
+                    <p class="card-text"> <strong>Fecha: </strong>  {{a.fechaAnalisis}} </p>
+                    <p class="card-text"> <strong>Tecnico:</strong> {{a.fkTecnico.usuario.fisrtname}} {{a.fkTecnico.usuario.lastname}} </p>
+                    <a href="{% url 'verResultados' a.id %}" class="btn btn-indicator">Ver Resultados</a>
+                </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="col-4">
+            <div class="card Apend text-center mb-4">
+                <h5 class="card-header">ID: {{a.id}}</h5>
+                <div class="card-body">
+                    <p class="card-title"> <strong>Estado: </strong> {{a.getEstado}}</p>
+                    <p class="card-text"> <strong>Objetivo: </strong> {{a.getObjetivo}}</p>
+                    <p class="card-text"> <strong>Fecha: </strong> {{a.fechaAnalisis}} </p>
+                    <p class="card-text"> <strong>Tecnico:</strong> {{a.fkTecnico.usuario.first_name}} {{a.fkTecnico.usuario.last_name}} </p>
+                    
+                    {% if isBoss or isAdmin  %}
+                      <a href="{% url 'conciliar' a.id %}" class="btn savebtn">Conciliar</a>
+                      <a href="{% url 'analizeM' a.id %}" class="btn savebtn">Iniciar</a>
+                    {% else %}
+                      <a href="{% url 'analizeM' a.id %}" class="btn savebtn">Iniciar</a>
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% else %}
+      <div class="card alert-danger"> 
+        <div class="card-body text-center">Ooops, no hay info que mostrar. 
+        </div> 
+      </div>
+    {% endif %}
+</div>
+{% endblock %}

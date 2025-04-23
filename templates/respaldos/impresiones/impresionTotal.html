@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es-es">
+<head>
+    {% load static %}
+    {% load utilidades %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="#">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- MDB -->
+    <link href="{% static 'css/mdb.min.css' %}" rel="stylesheet"/>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="{% static 'css/impresion.css' %}">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    {% block head_css %}
+    {% endblock %}
+    <title>Calidad de Taza: Impresión</title>
+</head>
+<body>
+    <header>
+        <div class="row d-flex justify-content-center align-items-center h-100 bg-light py-2 text-center">
+            <div class="col-4 text-center "><img class="bannerImg" src="{% static 'svg/solidaridad-logo-impresion.svg' %}" ></div>
+            <div class="col-4 text-center "></div>
+            <div class="col-4 text-center ">
+                <strong class="navbar-brand loggedoutnav">Calidad de Taza</strong>
+            </div>
+        </div>
+    </header>
+    <div class="container py-5">
+        <div class="row mb-3">
+            <div class="col-12 text-center display-3">
+              <h3>Análisis Físico</h3>
+            </div>
+        </div>
+        <div class="border-0 shadow-none">
+            <div id="muestras-content">
+                <div class="container" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+                    <input type="hidden" name="peso-{{m.idMuestra}}" value="{{m.peso}}" id="peso-{{m.idMuestra}}">
+                    <div class="border-0 shadow-none">
+                      <div class="px-0 py-3 headerColor">
+                        <div class="row ">
+                            <div class="col-2 text-center">
+                                <b>Muestra: {{ m.idMuestra }}</b>
+                            </div>
+                            <div class="col-5" >
+                              <b>Peso total de granos con defectos: </b>
+                              <input type="hidden" class="w-25" type="number" name="pDefectos" id="pDefectos-{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min=0 value="0" readonly>
+                            </div>
+                            <div class="col-5" >
+                                <p><b>Porcentaje de granos con defecto: </b><span id="por-{{m.idMuestra}}" class="porDefecto"></span>0%</p>
+                                <input type="hidden" name="porDefectos" id="POR_D_{{m.idMuestra}}" value="0"  form="addFisico_{{m.idMuestra}}">
+                            </div>
+                        </div>
+                      </div>
+                      <div class="container-fluid px-0" id="fisico-{{m.idMuestra}}-content">
+                              <!--Tamizado-->
+                              <div class="container py-3 px-0 finPag" id="tamizados-{{m.idMuestra}}" aria-labelledby="tamiz-{{m.idMuestra}}">
+                                  <div class="row mb-3">
+                                    <div class="col-6 text-start">
+                                      <h5>Tamizado</h5>
+                                    </div>
+                                  </div>
+                                  <table class="table table-striped">
+                                    <td scope="row">
+                                      <td>Humedad</td>
+                                      <td></td>
+                                      <td>Temperatura del Analisis</td>
+                                      <td></td>
+                                    </td>
+                                  </table>
+                                  <table class="table table-striped table-sm">
+                                    <thead>
+                                      <tr>
+                                        <th scope="col">Determinación de Tamaños</th>
+                                        <th scope="col">300g</th>
+                                        <th scope="col">Retención = PCix / PM * 100</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>Criba 20</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Criba 19</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Criba 18</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Criba 17</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Criba 16</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Criba 15</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Criba 14</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Debajo de Criba 14</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>TOTAL</td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <hr class="separator-form">
+                              </div>
+                              
+                              <!--Defectos 1-->
+                              <div class="container py-3 px-0 finPag" id="defecto1-{{m.idMuestra}}" aria-labelledby="defectos1-{{m.idMuestra}}">
+                                  <div class="row mb-3">
+                                    <div class="col-6 text-start">
+                                      <h5>Defectos Tipo 1</h5>
+                                    </div>
+                                  </div>
+                                  <table class="table table-striped table-sm">
+                                    <thead>
+                                      <tr>
+                                        <th scope="col">Defecto</th>
+                                        <th scope="col">Encontrados</th>
+                                        <th scope="col">N° de Defectos</th>
+                                        <th scope="col">Peso de Imperfecciones (gr)</th>
+                                        <th scope="col">% de Imperfecciones</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>Negro Total</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Agrio Total</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Vaina/Cereza</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Piedras Grandes</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Piedras Medianas</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Palos Grandes</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Palos Medianos</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      
+                                      
+                                    </tbody>
+                                  </table>
+                                  <hr class="separator-form">
+                              </div>
+                              
+                              <!--Defectos 2-->
+                              <div class="container py-3 px-0 finPag" id="defecto2-{{m.idMuestra}}" aria-labelledby="defectos2-{{m.idMuestra}}">
+                                  <div class="row mb-3">
+                                    <div class="col-6 text-start">
+                                      <h5>Defectos Tipo 2</h5>
+                                    </div>
+                                  </div>
+                                  <table class="table table-striped table-sm">
+                                    <thead>
+                                      <tr>
+                                        <th scope="col">Defecto</th>
+                                        <th scope="col">Encontrados</th>
+                                        <th scope="col">N° de Defectos</th>
+                                        <th scope="col">Peso de Imperfecciones (gr)</th>
+                                        <th scope="col">% de Imperfecciones</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>Pergamino</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Cascara</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Roto/Astillado</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Daños por insectos</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Negro parcial</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Amargo parcial</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Flotador</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Concha</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Piedras pequeñas</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Palos pequeños</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <td>Daños por agua</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <hr class="separator-form">
+                              </div>      
+                      </div>
+                      
+                      <div class="row mb-3">
+                        <div class="col-12 text-center display-3">
+                          <h3>Análisis Sensorial</h3>
+                        </div>
+                      </div>
+                      <!--Sensorial-->
+                      <div class="container-fluid px-0 py-3" id="sensorial-{{m.idMuestra}}-content">
+                        <div class="row mb-3 headerColor py-3 px-0">
+                            <div class="col-7 row">
+                              <div class="col-4 pt-0">
+                                <strong>Nivel de tueste: </strong>
+                              </div>
+                              <div class="col-8"> 
+                                <div class="range w-75">
+                                  <input type="range" class="form-range" min="1" max="3" step="1" id="tueste-{{m.idMuestra}}" name="tueste" form="addSensorial-{{m.idMuestra}}" required value="2" disabled/>
+                                  <div class="row">
+                                    <div class="col-4 text-start">B</div>
+                                    <div class="col-4 text-center">M</div>
+                                    <div class="col-4 text-end">A</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-3">
+                                <strong>Agua (ml)</strong>
+                            </div>
+                            <div class="col-2">
+                              <strong>Puntaje Final: <span id="puntajeFinal-{{m.idMuestra}}">0.0</span></strong>
+                              <input type="hidden" name="pFinal" id="pFinal-{{m.idMuestra}}" form="addSensorial-{{m.idMuestra}}" required value="0">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-3">
+                            <b>Fragancia</b>
+                          </div>
+                          <div class="col-3">
+                            <b>Sabor</b>
+                          </div>
+                          <div class="col-3">
+                            <b>Acidez</b>
+                          </div>
+                          <div class="col-3">
+                            <b>Cuerpo</b>
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-3">
+                            <b>Seco</b>
+                            <div class="range">
+                              <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="seco-{{m.idMuestra}}" name="seco"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" disabled/>
+                              <div class="row">
+                                <div class="col-4 text-start">B</div>
+                                <div class="col-4 text-center">M</div>
+                                <div class="col-4 text-end">A</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-3">
+                            <b>Remanente</b>
+                           
+                          </div>
+                          <div class="col-3">
+                            <b>Intensidad de Acidez</b>
+                            <div class="range">
+                              <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iAcido-{{m.idMuestra}}" name="iacidez"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" disabled/>
+                              <div class="row">
+                                <div class="col-4 text-start">B</div>
+                                <div class="col-4 text-center">M</div>
+                                <div class="col-4 text-end">A</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-3">
+                            <b>Intensidad de Cuerpo</b>
+                            <div class="range">
+                              <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="iCuerpo-{{m.idMuestra}}" name="icuerpo"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" disabled/>
+                              <div class="row">
+                                <div class="col-4 text-start">B</div>
+                                <div class="col-4 text-center">M</div>
+                                <div class="col-4 text-end">A</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-3">
+                            <b>Espuma</b>
+                            <div class="range">
+                              <input type="range" data-muestra="{{m.idMuestra}}" class="form-range" id="Espuma-{{m.idMuestra}}" name="espuma"  min="1" max="3" step="1" form="addSensorial-{{m.idMuestra}}" required value="2" disabled/>
+                              <div class="row">
+                                <div class="col-4 text-start">B</div>
+                                <div class="col-4 text-center">M</div>
+                                <div class="col-4 text-end">A</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-3">
+                            <b>Uniformidad</b>
+                            <div class="row mb-3">
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cUniformidad-1-{{m.idMuestra}}" value="1">
+                                <label for="cUniformidad-1-{{m.idMuestra}}">
+                                  <img id="cUniformidad-btn-1-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cUniformidad-2-{{m.idMuestra}}" value="2">
+                                <label for="cUniformidad-2-{{m.idMuestra}}">
+                                  <img id="cUniformidad-btn-2-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cUniformidad-3-{{m.idMuestra}}" value="3">
+                                <label for="cUniformidad-3-{{m.idMuestra}}">
+                                  <img id="cUniformidad-btn-3-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cUniformidad-4-{{m.idMuestra}}" value="4">
+                                <label for="cUniformidad-4-{{m.idMuestra}}">
+                                  <img id="cUniformidad-btn-4-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cUniformidad-5-{{m.idMuestra}}" value="5">
+                                <label for="cUniformidad-5-{{m.idMuestra}}">
+                                  <img id="cUniformidad-btn-5-{{m.idMuestra}}" class="buttonTazas uni" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                            </div>
+                            
+                          </div>
+                          <div class="col-3">
+                            <b>Taza Limpia</b>
+                            <div class="row mb-3">
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cTLimpia-1-{{m.idMuestra}}" value="1">
+                                <label for="cTLimpia-1-{{m.idMuestra}}">
+                                  <img id="cTLimpia-btn-1-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cTLimpia-2-{{m.idMuestra}}" value="2">
+                                <label for="cTLimpia-2-{{m.idMuestra}}">
+                                  <img id="cTLimpia-btn-2-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cTLimpia-3-{{m.idMuestra}}" value="3">
+                                <label for="cTLimpia-3-{{m.idMuestra}}">
+                                  <img id="cTLimpia-btn-3-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cTLimpia-4-{{m.idMuestra}}" value="4">
+                                <label for="cTLimpia-4-{{m.idMuestra}}">
+                                  <img id="cTLimpia-btn-4-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cTLimpia-5-{{m.idMuestra}}" value="5">
+                                <label for="cTLimpia-5-{{m.idMuestra}}">
+                                  <img id="cTLimpia-btn-5-{{m.idMuestra}}" class="buttonTazas tLmp" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                            </div>
+                            
+                          </div>
+                          <div class="col-3">
+                            <b>Dulzor</b>
+                            <div class="row mb-3">
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-1-{{m.idMuestra}}" value="1">
+                                <label for="cDulzor-1-{{m.idMuestra}}">
+                                  <img id="cDulzor-btn-1-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-2-{{m.idMuestra}}" value="2">
+                                <label for="cDulzor-2-{{m.idMuestra}}">
+                                  <img id="cDulzor-btn-2-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-3-{{m.idMuestra}}" value="3">
+                                <label for="cDulzor-3-{{m.idMuestra}}">
+                                  <img id="cDulzor-btn-3-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-4-{{m.idMuestra}}" value="4">
+                                <label for="cDulzor-4-{{m.idMuestra}}">
+                                  <img id="cDulzor-btn-4-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                              <div class="col-2">
+                                <input type="checkbox" class="tazas" id="cDulzor-5-{{m.idMuestra}}" value="5">
+                                <label for="cDulzor-5-{{m.idMuestra}}">
+                                  <img id="cDulzor-btn-5-{{m.idMuestra}}" class="buttonTazas dlc" src="{% static 'svg/taza.svg' %}"><br>
+                                  </label>
+                              </div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-3">
+                            <b>Balance</b>
+                          </div>
+                          <div class="col-3">
+                            <b>Catador</b>
+                          </div>
+                          <div class="col-3">
+                            <b>Rechazo</b>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-2">
+                              <p><b>Sabor</b></p>
+                            </div>
+                           
+                            <div class="col-9 badgeSabor-{{m.idMuestra}}">
+                    
+                            </div>
+                            <div class="col-2">
+                              <p><b>Fragancia/Aroma</b></p>
+                            </div>
+                             
+                            <div class="col-9 badgeAroma-{{m.idMuestra}}">
+                    
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                              <b>Observaciones</b>
+                                <textarea name="comentarios" id="comentarios" form="addSensorial-{{m.idMuestra}}" cols="100" rows="4" disabled></textarea>
+                            </div>
+                        </div>
+
+
+                      </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

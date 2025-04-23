@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load utilidades %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+{% block title %}
+    : Puntajes
+{% endblock %}
+
+{% block main %}
+<div class="container py-3">
+  <div class="card border-0 shadow-none">
+      <div class="card-body">
+          <div class="row justify-content-center align-items-center">
+              <div class="col-12 my-3">
+                  <div class="card text-center shadow">
+                      <div class="card-header text-start">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <strong>ID Muestra:</strong> {{muestra}}
+                                  </div>
+                                  <div class="col-12">
+                                      <strong>Conciliado por:</strong> {{tecnico.usuario.first_name}} {{tecnico.usuario.last_name}}
+                                  </div>
+                              </div>
+                      </div>            
+                      <div class="card-body">
+                          <table class="table table-hover table-sm text-center">
+                              <thead class="table-dark">
+                                <tr>
+                                  <th scope="col">Criterio</th>
+                                  {% for s in sensorial %}
+                                      <th scope="col"> {{s.fkCatador.usuario.first_name}} {{s.fkCatador.usuario.last_name}}</th>
+                                  {% endfor %}
+                                  
+                                  <th scope="col">Puntaje Final
+          
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <th scope="row">Aroma</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.fragancia}}</td>
+                                  {% endfor %}
+                                  <td>
+                                  
+                                          {{conciliacion.fragancia}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Sabor</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.pSabor}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.pSabor}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Remanente</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.remanente}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.remanente}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Acidez</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.acidez}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.acidez}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Cuerpo</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.cuerpo}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.cuerpo}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Balance</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.balance}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.balance}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Uniformidad</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.pUniformidad}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.pUniformidad}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Taza Limpia</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.cTLimpia}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.cTLimpia}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Dulzor</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.pDulzor}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.pDulzor}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Catador</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.pCatador}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.pCatador}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Tazas Def.</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.cTLimpia|restar}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.cTLimpia|restar}}
+                                  
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">Intensidad</th>
+                                  {% for s in sensorial %}
+                                      <td>{{s.getIntensidad}}</td>
+                                  {% endfor %}
+                                  <td>
+                                      
+                                          {{conciliacion.getIntensidad}}
+                                  
+                                  </td>
+                                </tr>
+                              </tbody>
+                              <tfoot>
+                                  <tr>
+                                      <th scope="row">Puntaje Final</th>
+                                      {% for s in sensorial %}
+                                      <td>{{s.pFinal}}</td>
+                                      {% endfor %}
+                                      <td>
+                                          
+                                                  {{conciliacion.pFinal}}
+                                          
+                                      </td>
+                                    </tr>
+                              </tfoot>
+                            </table>
+                      </div>
+                  </div>
+              </div>               
+          </div>
+          <div class="text-end">
+            <a href="{% url 'imprimir' muestra %}" class="btn savebtn" target="_blank" rel="noopener noreferrer">
+                <i class="fa fa-solid fa-print"> </i> Análisis
+            </a>
+            <a href="{% url 'analisisCompletados' %}" class="btn savebtn ms-auto">Regresar</a>
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}

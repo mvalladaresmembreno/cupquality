@@ -1,0 +1,67 @@
+.separatorProfile{
+    width: 100%;
+    height: 2px;
+    border-width:0;
+    opacity: 1;
+    color: #FFC800;
+    background-color: #FFC800;
+
+}
+
+.textInfo{
+    font-size: 19px;
+}
+
+.buttonNext
+{
+    background-color:#FFC800;
+    color: #ffffff
+}
+
+#marco
+{
+    border: 2px;
+}
+
+.boton{
+    text-transform: uppercase;
+    vertical-align: bottom;
+    border: 0;
+    box-shadow: 0 4px 9px -4px rgb(0 0 0 / 35%);
+    font-weight: 500;
+    padding: 0.625rem 1.5rem 0.5rem;
+    font-size: .75rem;
+    line-height: 1.5;
+    border-radius: 4px;
+    
+}
+.boton-guardar{
+    color: #2c2c2c !important;
+    background-color: #FFC800 !important;
+    border-color: #FFC800 !important;
+}
+.boton-eliminar{
+    color: #fff !important;
+    background-color: #dc3545 !important;
+    border-color: #f44336 !important;
+}
+.boton:hover
+{
+    transition: 0.2s ease-in;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 5px 10px !important;
+
+}
+.boton-eliminar:hover{
+    background-color: #7e0800 !important;
+    border-color: #7e0800  !important;
+}
+.boton-guardar:hover{
+    background-color: #d8b426 !important;
+    border-color: #d8b426  !important;
+}
+.boton:active{
+    transform: scale(0.75);
+    /* Scaling button to 0.98 to its original size */
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+    /* Lowering the shadow */
+}

@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/orden.css' %}">
+<link rel="stylesheet" href="{% static '/css/toggle-switch.css' %}">
+
+{% endblock %}
+
+{% block javascript %}
+<!-- https://listjs.com/ -->
+<script src="{% static 'scripts/list.min.js' %}"></script>
+<script src="{% static 'scripts/finca.js' %}"></script>
+{% if productor %}
+    <script>
+        openModal("openFincaModal");
+    </script>
+{% endif %}
+{% endblock %}
+
+{% block title %}
+    : Fincas
+{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+    <div class="col-6 text-start">
+        <p class="fs-2">Fincas</p>
+    </div> 
+    <div class="row justify-content-center align-items-center h-100 py-3">
+        <div class="col-6 text-start">
+            <div class="input-group mb-3 w-50">
+                <input class="form-control" type="search" id="Search" placeholder="Busqueda" autocomplete="off">
+            </div>
+        </div> 
+        <div class="col-6 text-end">
+            <button type="button" class="btn btn-dark" data-mdb-toggle="modal" data-mdb-target="#addFinca" id="openFincaModal">
+                + Crear Finca
+            </button>
+              <!-- Modal https://mdbootstrap.com/docs/standard/components/modal/#! -->
+            <div class="modal fade" data-mdb-backdrop="static" data-mdb-keyboard="false" id="addFinca" tabindex="-1" aria-labelledby="addFincaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addFincaLabel">CREAR FINCA</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <div class="modal-body text-start">
+                            <form action="{% url 'addFinca' %}" method="post" id="addFinca">
+                                {% csrf_token %}
+                            <div class=" row justify-content-start align-items-center h-100">
+                                <div class="col-12">
+                                    <label class="form-label text-black" for="productor">Productor</label>
+                                    <div class="input-group mb-3">
+                                        <select class="form-select " id="productor" aria-label="Productor" name="productor" required>
+                                            <option value="" default>Seleccione el Productor</option>
+                                            {% for prod in productores %}
+                                                
+                                                <option {% if productor %} {% if productor.idProd == prod.idProd %} selected {% endif %} {% endif %}
+                                                 value="{{prod.idProd}}">{{prod.firstnameProd}} {{prod.lastnameProd}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-black" for="nameFinca">Nombre de la Finca</label>
+                                    <div class="input-group mb-3">
+                                        <input class="form-control" type="text" id="nameFinca" name="nameFinca" placeholder="Nombre de la Finca" value="" required autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" row justify-content-start align-items-center h-100 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label text-black" for="areaFinca">Área de la Finca</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" name="areaFinca" id="areaFinca" step="0.01" required aria-describedby="mz-1">
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-6 px-0">
+                                    <input type="hidden" name="unidad" value="Ha" id="unidadFinca">
+                                    <div class="div-switch">
+                                        <input class="input" id="toggle" type="checkbox">
+                                        
+                                            <label class="label" for="toggle">
+                                                <div class="left">
+                                                    Ha
+                                                </div>
+                                                <div class="switch">
+                                                    <span class="slider round slider-yellow round"></span>
+                                                </div>
+                                                <div class="right">
+                                                    Mz
+                                                </div>
+                                            </label>
+                                      </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-start align-items-center ">
+                                <div class="col-4">
+                                    <label class="form-label text-black" for="departamento">Departamento</label>
+                                    <div class="input-group mb-3">
+                                        <select class="form-select " id="departamento" aria-label="Departamento" name="departamento" required>
+                                            <option value="" default>Seleccione el Departamento</option>
+                                            {% for p in paises %}
+                                            <optgroup label="{{p.namePais}}">
+                                                {% for d in departamentos %}
+                                                    {% if d.fkPais.idPais == p.idPais %}
+                                                        <option value="{{d.idDpto}}">{{d.nameDpto}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </optgroup>
+                                            {% endfor %}                                            
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label text-black" for="municipio">Municipio</label>
+                                    <div class="input-group mb-3">
+                                        <select class="form-select" id="municipio" aria-label="Municipio" name="municipio" required>
+                                            <option default value="" >Seleccione el Municipio</option>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" id="addLoteModal" name="addLote" value="false">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label text-black" for="comunidad">Comunidad</label>
+                                    <div class="input-group mb-3">
+                                        <select class="form-select" id="comunidad" aria-label="Comunidad" name="comunidad" required>
+                                            <option default value="" >Seleccione la Comunidad</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>                           
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn savebtn" id="saveFincabtn">GUARDAR</button>
+                            <button type="button" class="btn btn-success" onclick="saveFinca(event)">GUARDAR Y CREAR LOTE</button>
+                        </div>
+                    </form>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- TABLA PROD -->
+    <div id="table-list">
+        <table class="table table-striped table-hover text-center" id="tblSearch">
+            <thead class="table-dark">
+              <tr id="tableHeader">
+                <th scope="col" class="sort" data-sort="name">Nombre Finca</th>
+                <th scope="col"class="sort" data-sort="area">Area Finca</th>
+                <th scope="col" class="sort" data-sort="dpto">Departamento</th>
+                <th scope="col" class="sort" data-sort="munic">Municipio</th>
+                <th scope="col" class="sort" data-sort="com">Comunidad</th>
+                {% if isAdmin or isBoss %}
+                <th scope="col">Opciones</th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody class="list">
+                {% if fincas %}
+                    {% for f in fincas %}
+                    <tr id="f-{{f.idFinca}}" class="align-middle">
+                        <td scope="row" class="name" id="name-{{f.idFinca}}">{{f.nameFinca}}</td>
+                        <td class="area" id="area-{{f.idFinca}}">{{f.area|floatformat:-2}}</td>
+                        <td class="dpto" id="dpto-{{f.idFinca}}">{{f.fkCom.fkMun.fkdpto.nameDpto}}</td>
+                        <td class="munic" id="munic-{{f.idFinca}}">{{f.fkCom.fkMun.nameMun}}</td>
+                        <td class="com" id="com-{{f.idFinca}}">{{f.fkCom.nameCom}}</td>
+                        {% if isAdmin or isBoss %}
+                            <td class="justify-content-center align-items-center">
+                                <button class="btn btn-floating btn-danger text-light fas fa-trash-alt" type="submit" form="delete-{{f.idFinca}}"></button>
+                                <button type="button" class="btn btn-floating savebtn fas fa-edit ms-xxl-3 mt-2 mt-xxl-auto" data-mdb-toggle="modal" data-mdb-target="#updateModal-{{f.idFinca}}"></button>
+                                <!-- Modal https://mdbootstrap.com/docs/standard/components/modal/#! -->
+                                <div class="modal fade" data-mdb-backdrop="static" data-mdb-keyboard="false" id="updateModal-{{f.idFinca}}" tabindex="-1" aria-labelledby="updateModal-{{f.idFinca}}-Label" aria-hidden="true">
+                                  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                                      <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h5 class="modal-title" id="updateModal-{{f.idFinca}}-Label">EDITAR FINCA</h5>
+                                          <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close" id="close-{{f.idFinca}}"></button>
+                                      </div>
+                                      
+                                          <div class="modal-body text-start">
+                                            <form onsubmit="updateFinca(event, {{f.idFinca}});" method="post" id="update-{{f.idFinca}}">
+                                                {% csrf_token %}
+                                            <div class=" row justify-content-start align-items-center h-100">
+                                                <div class="col-12">
+                                                    <label class="form-label text-black" for="productor">Productor</label>
+                                                    <div class="input-group mb-3">
+                                                        <select class="form-select " id=productor" aria-label="Productor" name="productor" required>
+                                                            <option value="" default>Seleccione el Productor</option>
+                                                            {% for prod in productores %}
+                                                                {% if prod.idProd == f.fkProd.idProd %}
+                                                                        <option selected value="{{prod.idProd}}">{{prod.firstnameProd}} {{prod.lastnameProd}}</option>
+                                                                    {% else %}
+                                                                        <option value="{{prod.idProd}}">{{prod.firstnameProd}} {{prod.lastnameProd}}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label text-black" for="nameFinca">Nombre de la Finca</label>
+                                                    <div class="input-group mb-3">
+                                                        <input class="form-control" type="text" id="nameFinca" name="nameFinca" placeholder="Nombre de la Finca" value="{{f.nameFinca}}" required autocomplete="off">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class=" row justify-content-start align-items-center h-100 mb-2">
+                                                <div class="col-12">
+                                                    <label class="form-label text-black" for="fechaNac">Area de la Finca</label>
+                                                    <div class="input-group mb-3">
+                                                        <input type="number" name="areaFinca" id="areaFinca" step="0.01" required aria-describedby="a-{{f.idFinca}}" value="{{f.area|floatformat:-2}}">
+                                                        <span class="input-group-text" id="a-{{f.idFinca}}">{{f.unidad}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                              <div class=" row justify-content-center align-items-center h-100">
+                                                <div class="col">
+                                                    <label class="form-label text-black" for="comunidad">Comunidad</label>
+                                                    <div class="input-group mb-3">
+                                                        <select class="form-select " id="comunidad" aria-label="Comunidad" name="comunidad" required>
+                                                            <option value="">Seleccione la Comunidad</option>
+                                                            {% for p in paises %}
+                                                            <optgroup label="{{p.namePais}}">
+                                                                {% for d in departamentos %}
+                                                                    {% if d.fkPais.idPais == p.idPais %}
+                                                                        <optgroup label="&nbsp;&nbsp;&nbsp;&nbsp;{{d.nameDpto}}">
+                                                                            {% for m in ubicaciones %}
+                                                                                {% if m.fkdpto.idDpto == d.idDpto %}
+                                                                                <optgroup label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{m.nameMun}}"></optgroup>
+                                                                                {% for c in comunidades %}
+                                                                                    {% if c.fkMun.idMun == m.idMun %}
+                                                                                        {% if c.idCom == f.fkCom.idCom %}
+                                                                                            <option selected value="{{c.idCom}}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{c.nameCom}}</option>
+                                                                                        {% else %}
+                                                                                            <option value="{{c.idCom}}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{c.nameCom}}</option>
+                                                                                        {% endif %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                                {% endif %}
+                                                                            </optgroup>
+                                                                            {% endfor %}
+                                                                        </optgroup>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </optgroup>
+                                                            {% endfor %}  
+                                                              
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                              </div>      
+                                          <div class="modal-footer">
+                                              <button type="submit" class= "btn savebtn">ACTUALIZAR </button>
+                                          </div>
+                                      </form>
+                                    </div>
+                                      </div>
+                                  </div>
+                                </div>
+                                <form onsubmit="rmFinca(event, {{f.idFinca}});" method="POST" id="delete-{{f.idFinca}}">
+                                    {% csrf_token %}
+                                </form>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                {% else %}
+              <tr>
+                <td colspan="6">NO HAY DATOS QUE MOSTRAR</td>
+              </tr>
+              {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+{% endblock %}

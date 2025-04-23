@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jsignature_filters %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/profile.css' %}">
+
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+
+{% block title %}
+    : Mi Perfil
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5 w-75 rContenedor">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                
+                <div class="col-10">
+                    <h5>Nombre completo</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.usuario.first_name}} {{usuario.usuario.last_name}} </p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Dirección de correo electrónico</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.usuario.email}}</p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Organización</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.org.name_org}}</p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-5">
+                    <h5>Ubicación</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.org.ubicacion.nameMun}}, {{usuario.org.ubicacion.fkdpto.nameDpto}}, {{usuario.org.ubicacion.fkdpto.fkPais.namePais}}</p>
+                </div>
+                <div class="col-5">
+                    <h5>Tipo de Usuario</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">                                                                     
+                        {% for g in usuario.usuario.groups.all %}
+                        {% if forloop.first %}
+                            {% if forloop.last == forloop.first %}
+                                {{g.name}}.
+                            {% else %}
+                                {{g.name}},
+                            {% endif %}
+                        {% elif forloop.last %}   
+                            {{g.name}}.
+                        {% else %}
+                        , {{g.name}},
+                        {% endif %}
+                    {% endfor %}
+                    </p>
+                </div>
+            </div>
+            <br>
+            {% if usuario.firma %}
+                <div class="row justify-content-center">
+                    <div class="col-10 text-center">
+                        <h5> Firma: </h5>
+                        <hr class="separatorProfile"></hr>
+                        <img src="{{ usuario.firma|signature_base64 }}" alt="{{usuario.firma}}" width="50%">
+                        <br>
+                        <a class="btn btn-dark" href="{% url 'firma' %}">Actualizar</a>                        
+                    </div>
+                </div>
+            {% else %}
+            <div class="row justify-content-center">
+                <div class="col-10 text-start">
+                    <hr class="separatorProfile"></hr>
+                    <a class="btn btn-dark" href="{% url 'firma' %}">Crear Firma</a>                        
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}

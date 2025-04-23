@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load jsignature_filters %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/profile.css' %}">
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
+    {{ firma.media }}
+    <script >
+        const reset = document.querySelector('input[type=button]');
+        const guardar = document.querySelector('input[type=submit]');
+        reset.classList.add('boton', 'boton-eliminar');
+        guardar.classList.add('boton', 'boton-guardar');
+        reset.classList.remove('btn');
+        guardar.classList.remove('btn', 'btn-success');
+    </script>
+{% endblock %}
+
+
+{% block title %}
+    : Mi Perfil
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5 w-75 rContenedor">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Nombre completo</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.usuario.first_name}} {{usuario.usuario.last_name}} </p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Dirección de correo electrónico</h5>
+                    <hr class="separatorProfile"></hr>
+                    <p class="textInfo">{{usuario.usuario.email}}</p>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-10 text-start">
+                    <form id="addFirma" action="" method="post">
+                        {% csrf_token %}
+                        {{firma}}
+                        <div class="col-12 text-start mt-2">
+                            <input type="submit" value="Guardar" class="btn btn-success"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

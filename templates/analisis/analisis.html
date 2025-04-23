@@ -1,0 +1,1492 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src='https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js'></script>
+<script src="{% static 'scripts/analisis.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    : Analisis {{analisis.id}}
+{% endblock %}
+
+{% block main %}
+{% if DONE == True %}
+    <div class="container mt-3 w-75 rContenedor">
+        <div class="card alert-danger"> 
+            <div class="card-body text-center">Analisis realizado. 
+            </div> 
+          </div>
+    </div>
+{% else %}
+<div class="container mt-3 w-75 rContenedor">
+    <div class="accordion border-0" id="accordionExample">
+        <div class="row align-items-end h-100 py-3 ">
+            <p class="fs-3" id="AnalisisText">Analisis de Muestra</p>
+        </div>
+        <div class="steps">
+            <progress id="progress" value=0 max=10 ></progress>
+            
+            <div class="step-item">
+                <button class="step-button text-center" type="button" data-toggle="collapse"
+                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="step1">
+                    1
+                </button>
+                <div class="step-title"></div>
+            </div>
+            <div class="step-item">
+                <button class="step-button text-center collapsed" type="button" data-toggle="collapse"
+                    data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" id="step2">
+                    2
+                </button>
+                <div class="step-title"></div>
+            </div>
+        </div>
+        <div class="card border-0 shadow-none">
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div  id="headingOne" class="titleName titleFirstStep">Analisis fisico</div>
+                <hr class="separator-analisis">
+                <div class="card-body" id="mCard">
+                    {% for m in muestras %}
+                        <div class="card my-5" id="muestra-{{m.idMuestra}}">
+                            <form onsubmit="saveFisica(event, {{m.idMuestra}})" id="fisico-{{m.idMuestra}}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="idAnalisis" value="{{idAnalisis}}">
+                            </form>
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-4 text-center">
+                                        <h4>Muestra: {{ m.idMuestra }}</h4>
+                                    </div>
+                                    <div class="col-4" >
+                                            <b>Peso total de gramos con defectos: </b>
+                                            <input class="w-25" type="number" name="pDefectos" id="pDefectos-{{m.idMuestra}}" form="fisico-{{m.idMuestra}}" step="0.01" min=0 onkeyup="calculate(event, {{m.idMuestra}}, {{m.peso|floatformat:-2}});">
+                                    </div>
+                                    <div class="col-4" >
+                                        <p><b>Porcentaje de granos con defecto: </b><span id="por-{{m.idMuestra}}" class="porDefecto"></span>%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-3 pl-4 py-4 ">    
+                                        <div class="col-12">
+                                            <h6><b>Defectos tipo I</b></h6>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="AG" name="dTipo1" id="agrio-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="agrio-{{m.idMuestra}}">Agrio</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="AR" name="dTipo1" id="arrugado-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="arrugado-{{m.idMuestra}}">Arrugado</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="BS" name="dTipo1" id="bSevera-{{m.idMuestra}}">
+                                                <label class="form-check-label" for="bSevera-{{m.idMuestra}}">Broca Severa</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="CP" name="dTipo1" id="cPulpa-{{m.idMuestra}}">
+                                                <label class="form-check-label" for="cPulpa-{{m.idMuestra}}">Cascara o pulpa</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="CS" name="dTipo1" id="cSeca-{{m.idMuestra}}">
+                                                <label class="form-check-label" for="cSeca-{{m.idMuestra}}">Cereza seca</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-3">
+                                        <div class="py-4 col-12">
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="DH" name="dTipo1" id="dHongos-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="dHongos-{{m.idMuestra}}">Daño por hongos</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="ME" name="dTipo1" id="mExtrano-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="mExtrano-{{m.idMuestra}}">Material extraño</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="NGR" name="dTipo1" id="negro-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="negro-{{m.idMuestra}}">Negro</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="QBR" name="dTipo1" id="quebrados-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="quebrados-{{m.idMuestra}}">Quebrados</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="PRG" name="dTipo1" id="pergamino-{{m.idMuestra}}">
+                                                <label class="form-check-label" for="pergamino-{{m.idMuestra}}">Pergamino</label>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <!--Defectos tipo 2 checkboxes-->
+                                    <div class="col-3">
+                                        <div class="py-4 col-12">
+                                            <h6> <b>Defectos tipo II</b></h6>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="AGRP" name="dTipo2" id="aParcial-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="aParcial-{{m.idMuestra}}">Agrio parcial</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="BLFL" name="dTipo2" id="bFlotador-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="bFlotador-{{m.idMuestra}}">Blanco/flotador</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="BRLV" name="dTipo2" id="bLeve-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="bLeve-{{m.idMuestra}}">Broca leve</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="CNCH" name="dTipo2" id="concha-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="concha-{{m.idMuestra}}">Concha</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="DOM" name="dTipo2" id="dMordidos-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="dMordidos-{{m.idMuestra}}">Daños o mordidos</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="py-4 col-12">
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="ELF" name="dTipo2" id="elefante-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="elefante-{{m.idMuestra}}">Elefante</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="IBLL" name="dTipo2" id="iBallos-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="iBallos-{{m.idMuestra}}">Inmaduros ballos</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="QFR" name="dTipo2" id="qFrio-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="qFrio-{{m.idMuestra}}">Quemados por frio</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="NPRC" name="dTipo2" id="nParcial-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="nParcial-{{m.idMuestra}}">Negro parcial</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input form="fisico-{{m.idMuestra}}" class="form-check-input" type="checkbox" value="SBRS" name="dTipo2" id="sobresecado-{{m.idMuestra}}" >
+                                                <label class="form-check-label" for="sobresecado-{{m.idMuestra}}">Sobresecado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--Guardado-->  
+                                </div>
+                                <div class="row px-0">
+                                    <div class="col-12 text-center doneButton px-0">
+                                        <a href="javascript:void(0);" onclick="saveFisica(event,'{{m.idMuestra}}');" class="btn my-0 py-0 w-100 px-0">
+                                            <span class="fas fa-check compact" style="font-size: 2rem; color: white;"></span>
+                                        </a>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %} 
+                  <!--Buttons-->
+                    <div class="d-grid  d-md-flex justify-content-md-end">   
+                      <!--Next Button-->
+                      <button class="btn btn-outline-warning me-md-2" type="button" onclick="clic2();">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 shadow-none">
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                <div  id="headingTwo" class="titleName titleSecondStep">Analisis Sensorial</div>
+                <hr class="separator-analisis">
+                <div class="card-body" id="mSensorial">
+                    {% for m in muestras %}
+                        <div class="card mt-3 mb-5">
+                            <form onsubmit="saveSensorial(event, {{m.idMuestra}})" id="sensorial-{{m.idMuestra}}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="idAnalisis" value="{{idAnalisis}}">
+                            </form>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <!--Col 1-->
+                                    <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 py-2 pl-4">
+                                        <!--Cantidad de agua de la muestra-->
+                                        <div class="py-2">
+                                            <h4>ID: {{m.idMuestra}}</h4>
+                                            <label for="">Detalles de la muestra</label>
+                                            <h6>Cantidad de agua de la muestra (ml)</h6>
+                                            <input form="sensorial-{{m.idMuestra}}" type="number" name="pHumedad" id="pHumedad" max=100 min=0>
+                                        </div>
+                                        <!--Fragancia-->
+                                        <div class="py-2">
+                                            <label for="fragancia">Fragancia</label>
+                                            <input form="sensorial-{{m.idMuestra}}" type="number" onkeyup="validate10(event);" name="fragancia" id="fragancia" max=10 min=0>
+                                        </div>
+                                        <!--Balance-->
+                                        <div class="py-2">
+                                            <label for="balance">Balance</label>
+                                            <input form="sensorial-{{m.idMuestra}}" type="number" name="balance" onkeyup="validate10(event);" id="balance" max=10 min=0>
+                                        </div> 
+                                        <!--Aroma MODAL-->
+                                        <div class="py-2">
+                                            <label for="aroma">Aroma</label><br>
+                                            <input form="sensorial-{{m.idMuestra}}" class="w-50" type="number" name="pAroma" onkeyup="validate10(event);" id="pAroma" max=10 min=0>
+                                            <!--aroma-{{m.idMuestra}}-->
+                        
+                                            <div class="modal fade" id="aromas-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="aromas-{{m.idMuestra}}-ModalLabel" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="aromas-{{m.idMuestra}}-ModalLabel">Aromas</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row justify-content-center align-items-center h-100">
+                                                                <div class="text-center">
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#AromaNivel1-{{m.idMuestra}}" data-bs-toggle="modal" data-bs-dismiss="modal">+</button>
+                                                                    <label for="">Nivel I</label>
+                                                                    <br>
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#AromaNivel2-{{m.idMuestra}}" data-bs-toggle="modal" data-bs-dismiss="modal">+</button>
+                                                                    <label for="">Nivel II</label>
+                                                                    <br>
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#AromaNivel3-{{m.idMuestra}}" data-bs-toggle="modal" data-bs-dismiss="modal">+</button>
+                                                                    <label for="">Nivel III</label>
+                                                                    <br>
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#AromaNivel4-{{m.idMuestra}}" data-bs-toggle="modal" data-bs-dismiss="modal">+</button>
+                                                                    <label for="">Nivel IV</label>
+                                                                    <br>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel I-->
+                                                <div class="modal fade" id="AromaNivel1-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="AromaNivel1-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="AromaNivel1-{{m.idMuestra}}-Label">Aromas</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row justify-content-center align-items-center h-100">
+                                                                <h5>Nivel I</h5>
+                                                                <div class="col-2 ps-4">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi" id="enzi-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="enzi-{{m.idMuestra}}">
+                                                                            Enzimático
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az" id="az-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="az-{{m.idMuestra}}">
+                                                                            Azúcar Tostada
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest" id="dest-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="dest-{{m.idMuestra}}">
+                                                                            Destilación
+                                                                        </label>
+                                                                    </div>                                                   
+                                                                </div>
+                                                            
+                                                                <div class="col-8 text-center">
+                                                                    <img src="/static/svg/aromas-completo.svg" class="img70" >
+                                                                </div>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-indicator btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                        <button class="btn btn-danger btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel II-->
+                                                <div class="modal fade" id="AromaNivel2-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="AromaNivel2-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="AromaNivel2-{{m.idMuestra}}-Label">Aromas</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row h-100">
+                                                                <h5>Nivel II</h5>
+                                                                <div class="col-1 me-5">
+                                                                    <!--Enzimatico-->
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Enzimático</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo" id="enzi-flo--{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="enzi-flo-{{m.idMuestra}}">
+                                                                                Floral
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru" id="enzi-fru-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="enzi-fru-{{m.idMuestra}}">
+                                                                                Frutal
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb" id="enzi-herb-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="enzi-herb-{{m.idMuestra}}">
+                                                                                Herbáceo
+                                                                            </label>
+                                                                        </div>                                                   
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Azúcar Tostada-->
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Azúcar Tostada</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu" id="az-nu-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="az-nu-{{m.idMuestra}}">
+                                                                                Nuez
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car" id="az-car-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="az-car-{{m.idMuestra}}">
+                                                                            Caramelo
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho" id="az-cho-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="az-cho-{{m.idMuestra}}">
+                                                                                Chocolate
+                                                                            </label>
+                                                                        </div>                                                    
+                                                                    </div>
+                                                                    <br>
+                                                                </div>
+                                                                <div class="col-1 me-5">
+                                                                    <!--Destilación-->
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Destilación</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res" id="dest-res-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="dest-res-{{m.idMuestra}}">
+                                                                                Resinoso
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic" id="dest-pic-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="dest-pic-{{m.idMuestra}}">
+                                                                                Picante
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car" id="dest-car-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="dest-car-{{m.idMuestra}}">
+                                                                                Carbonil
+                                                                            </label>
+                                                                        </div>                                                   
+                                                                    </div>
+                                                                    <br>
+                                                                    
+                        
+                                                                </div>
+                                                                <div class="col-8 text-center">
+                                                                    <img src="/static/svg/aromas-completo.svg" class="img70" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-indicator btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                        <button class="btn btn-danger btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel III-->
+                                                <div class="modal fade" id="AromaNivel3-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="AromaNivel3-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="AromaNivel3-{{m.idMuestra}}-Label">Aromas</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row h-100">
+                                                                <h5>Nivel III</h5>
+                                                                <!--Enzimatico-->
+                                                                <div class="col-2">
+                                                                    <!--Enzimatico - Floral-->
+                                                                    <div class="ps-4">
+                                                                        <h6><b>Enzimático</b></h6>
+                                                                        <label for="">Floral</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo-fra" id="enzi-flo-fra-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="enzi-flo-fra-{{m.idMuestra}}">
+                                                                                    Fragante
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo-flo" id="enzi-flo-flo-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="enzi-flo-flo-{{m.idMuestra}}">
+                                                                                    Floral
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Enzimatico - Frutal-->
+                                                                    <div class="ps-4">
+                                                                        <label for="">Frutal</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru-ber" id="enzi-fru-ber-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="enzi-fru-ber-{{m.idMuestra}}">
+                                                                                    Berries
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru-ci" id="enzi-fru-ci-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="enzi-fru-ci-{{m.idMuestra}}">
+                                                                                    Cítrico
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Enzimatico - Herbáceo-->
+                                                                    <div class="ps-4">
+                                                                        <label for="">Herbáceo</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb-leg" id="enzi-herb-leg-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="enzi-herb-leg-{{m.idMuestra}}">
+                                                                                    Leguminoso
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb-ali" id="enzi-herb-ali-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="enzi-herb-ali-{{m.idMuestra}}">
+                                                                                    Aliáceo
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                </div>
+                                                                <!--Azucar Tostada-->
+                                                                <div class="col-2">
+                                                                    <!--Azucar - Nuez-->
+                                                                    <div class="ps-4">
+                                                                        <h6><b>Azúcar Tostada</b></h6>
+                                                                        <label for="">Nuez</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu-no" id="az-nu-no-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="az-nu-no-{{m.idMuestra}}">
+                                                                                    Nogado
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu-mal" id="az-nu-mal-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="az-nu-mal-{{m.idMuestra}}">
+                                                                                    Malteado
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Azucar - Caramelo-->
+                                                                    <div class="ps-4">
+                                                                        <label for="">Caramelo</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car-car" id="az-car-car-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="az-car-car-{{m.idMuestra}}">
+                                                                                    Caramelo
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car-jar" id="az-car-jar-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="az-car-jar-{{m.idMuestra}}">
+                                                                                    Jarabe
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Azucar - Chocolate-->
+                                                                    <div class="ps-4">
+                                                                        <label for="">Chocolate</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho-cho" id="az-cho-cho-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="az-cho-cho-{{m.idMuestra}}">
+                                                                                    Chocolate
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho-vai" id="faz-cho-vai-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="az-cho-vai-{{m.idMuestra}}">
+                                                                                    Vainilla
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                </div>
+                                                                <!--Destilación-->
+                                                                <div class="col-2">
+                                                                    <!--Destilacion - Resinoso-->
+                                                                    <div class="ps-4">
+                                                                        <h6><b>Destilación</b></h6>
+                                                                        <label for="">Resinoso</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res-ter" id="dest-res-ter-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dest-res-ter-{{m.idMuestra}}">
+                                                                                    Terpénico
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res-med" id="dest-res-med-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dest-res-med-{{m.idMuestra}}">
+                                                                                    Medicinal
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Destilacion - Picante-->
+                                                                    <div class="ps-4">
+                                                                        <label for="">Picante</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic-rec" id="dest-pic-rec-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dest-pic-rec-{{m.idMuestra}}">
+                                                                                    Recalentado
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic-pun" id="dest-pic-pum-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dest-pic-pum-{{m.idMuestra}}">
+                                                                                    Pungente
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Destilacion - Carbonil-->
+                                                                    <div class="ps-4">
+                                                                        <label for="">Carbonil</label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car-ahu" id="dest-car-ahu-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dest-car-ahu-{{m.idMuestra}}">
+                                                                                    Ahumado
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car-cen" id="dest-car-cen-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dest-car-cen-{{m.idMuestra}}">
+                                                                                    Ceniza
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                                                                        
+                                                                    </div>
+                                                                    <br>
+                                                                </div>
+                                                    
+                                                                <div class="col-6 text-center">
+                                                                    <img src="/static/svg/aromas-completo.svg" class="img80" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-indicator btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                        <button class="btn btn-danger btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel IV-->
+                                                <div class="modal fade" id="AromaNivel4-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="AromaNivel4-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-scrollable">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                        <h5 class="modal-title" id="AromaNivel4-{{m.idMuestra}}-Label">Aromas</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="container-fluid">
+                                                                <div class="row h-100">
+                                                                    <h5>Nivel IV</h5>
+                                                                    <!--Enzimatico-->
+                                                                    <div class="col-2">
+                                                                            <!--Enzimatico - Floral - Fragante, Floral-->
+                                                                            <div class="ps-4">
+                                                                                <h5>Enzimático</h5>
+                                                                                <br>
+                                                                                <!--Fragante-->  
+                                                                                <label for=""><b>Floral, Fragante</b></label>
+                                                                                <div class="row">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo-fra-alb" id="enzi-flo-fra-alb-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-flo-fla-alb-{{m.idMuestra}}">
+                                                                                            Albahaca Dulce
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo-fra-car" id="enzi-flo-fra-car-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-flo-fra-car-{{m.idMuestra}}">
+                                                                                        Cardamomo
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!--Floral-->
+                                                                                <label for=""><b>Floral, Floral</b></label>
+                                                                                <div class="row">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo-flo-ver" id="enzi-flo-flo-ver-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-flo-flo-ver-{{m.idMuestra}}">
+                                                                                            Verdes
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-flo-flo-jaz" id="enzi-flo-flo-jaz-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-flo-flo-jaz-{{m.idMuestra}}">
+                                                                                        Jazmín
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>                                                     
+                                                                            </div>
+                                                                            <br>
+                                                                            <!--Enzimatico - Frutal - Berries, Cítrico-->
+                                                                            <div class="ps-4">
+                        
+                                                                                <!--Berries-->  
+                                                                                <label for=""><b>Frutal, Berries</b></label>
+                                                                                <div class="row">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru-ci-ber-mora" id="enzi-fru-ci-ber-mora-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-fru-ber-mora-{{m.idMuestra}}">
+                                                                                        Mora
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru-ci-ber-fram" id="enzi-fru-ci-ber-fram-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-fru-ber-fram-{{m.idMuestra}}">
+                                                                                        Frambuesa
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!--Citricos-->
+                                                                                <label for=""><b>Frutal, Cítricos</b></label>
+                                                                                <div class="row">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru-ci-tor" id="enzi-fru-ci-tor-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-fru-ci-tor-{{m.idMuestra}}">
+                                                                                        Toronja
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-fru-ci-lim" id="enzi-fru-ci-lim-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-fru-ci-lim-{{m.idMuestra}}">
+                                                                                        Limón
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>                                                     
+                                                                            </div>
+                                                                            <br>
+                                                                            <!--Enzimatico - Herbáceo - Leguminoso, Aliáceo-->
+                                                                            <div class="ps-4">
+                                                                                <!--Leguminoso-->  
+                                                                                <label for=""><b>Herbáceo, Leguminoso</b></label>
+                                                                                <div class="row">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb-leg-alf" id="enzi-herb-leg-alf-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-herb-leg-alf-{{m.idMuestra}}">
+                                                                                        Alfalfa
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb-leg-rep" id="enzi-herb-leg-rep-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-herb-leg-rep-{{m.idMuestra}}">
+                                                                                        Repollo
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <!--Aliáceo-->
+                                                                                <label for=""><b>Herbáceo, Aliáceo</b></label>
+                                                                                <div class="row">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb-ali-ajo" id="enzi-herb-ali-ajo-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-herb-ali-ajo-{{m.idMuestra}}">
+                                                                                        Ajo
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="enzi-herb-ali-ceb" id="enzi-herb-ali-ceb-{{m.idMuestra}}">
+                                                                                        <label class="form-check-label" for="enzi-herb-ali-ceb-{{m.idMuestra}}">
+                                                                                        Cebolla
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>                                                     
+                                                                            </div>
+                                                                            <br>   
+                                                                    </div>
+                                                                    <!--Azúcar tostada-->
+                                                                    <div class="col-3">
+                                                                        <!--Azúcar tostada - Nuez - Nogado, Malteado-->
+                                                                        <div class="ps-4">
+                                                                            <h5>Azúcar Tostada</h5>
+                                                                            <br>
+                                                                            <!--Nogado-->  
+                                                                            <label for=""><b>Nuez, Nogado</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu-no-man" id="az-nu-no-man-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-nu-no-man-{{m.idMuestra}}">
+                                                                                        Maní
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu-no-al" id="az-nu-no-al-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-nu-no-al-{{m.idMuestra}}">
+                                                                                    Almendra
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--Malteado-->
+                                                                            <label for=""><b>Nuez, Malteado</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu-mal-ma" id="az-nu-mal-ma-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-nu-mal-ma-{{m.idMuestra}}">
+                                                                                        Maíz
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-nu-mal-ce" id="az-nu-mal-ce-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-nu-mal-ce-{{m.idMuestra}}">
+                                                                                        Cebada
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>                                                     
+                                                                        </div>
+                                                                        <br>
+                                                                        <!--Azucar tostada, Caramelo, Caramelo, Jarabe-->
+                                                                        <div class="ps-4">
+                                                                            
+                                                                            <!--Caramelo-->  
+                                                                            <label for=""><b>Caramelo, Caramelo</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car-car-to" id="az-car-car-to-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-car-car-to-{{m.idMuestra}}">
+                                                                                    Toffee
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car-car-pra" id="az-car-car-pra-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-car-car-pra-{{m.idMuestra}}">
+                                                                                    Praliné
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--Jarabe-->
+                                                                            <label for=""><b>Caramelo, Jarabe</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car-jar-mi" id="az-car-jar-mi-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-car-jar-mi-{{m.idMuestra}}">
+                                                                                        Miel
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-car-jar-mel" id="az-car-jar-mel-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-car-jar-mel-{{m.idMuestra}}">
+                                                                                        Melasa
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>                                                     
+                                                                        </div>
+                                                                        <br>
+                                                                        <!--Azucar, Chocolate, Chocolate, Vainilla-->
+                                                                        <div class="ps-4">
+                                                                            
+                                                                            <!--Chocolate-->  
+                                                                            <label for=""><b>Chocolate, Chocolate</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho-cho-pas" id="az-cho-cho-pas-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-cho-cho-pas-{{m.idMuestra}}">
+                                                                                        Pastelería
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho-cho-gall" id="az-cho-cho-gall-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-cho-cho-gall-{{m.idMuestra}}">
+                                                                                        Galleta Danesa
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <br>
+                                                                            <!--Vainilla-->
+                                                                            <label for=""><b>Chocolate, Vainilla</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho-vai-sui" id="az-cho-vai-sui-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-cho-vai-sui-{{m.idMuestra}}">
+                                                                                        Suiza
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="az-cho-vai-nat" id="az-cho-vai-nat-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="az-cho-vai-nat-{{m.idMuestra}}">
+                                                                                        Natilla
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>                                                     
+                                                                        </div>
+                                                                        <br>   
+                                                                    </div>
+                                                                    <!--Destilación-->
+                                                                    <div class="col-2">
+                                                                        <!--Destilacion, Resinoso, Terpenico, medicinal-->
+                                                                        <div class="ps-4">
+                                                                            <h5>Destilación</h5>
+                                                                            <br>
+                                                                            <!--Terpenico-->  
+                                                                            <label for=""><b>Resinoso, Terpénico</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res-ter-pin" id="dest-rest-ter-pin-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-rest-ter-pin-{{m.idMuestra}}">
+                                                                                        Pino
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res-ter-bal" id="dest-rest-ter-bal-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-res-ter-bal-{{m.idMuestra}}">
+                                                                                    Balsámico
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--Medicinal-->
+                                                                            <label for=""><b>Resinoso, Medicinal</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res-med-alc" id="dest-res-med-alc-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-res-med-alc-{{m.idMuestra}}">
+                                                                                        Alcantor
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-res-med-cin" id="dest-res-med-cin-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-res-med-cin-{{m.idMuestra}}">
+                                                                                        Cinedílico
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>                                                     
+                                                                        </div>
+                                                                        <br>
+                                                                        <!--Destilacion, Picante, Recalentado, Pungente-->
+                                                                        <div class="ps-4">
+                                                                            
+                                                                            <!--Recalentado-->  
+                                                                            <label for=""><b>Picante, Recalentado</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic-rec-nu" id="dest-pic-rec-nu-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                                                        Nuez Moscada
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic-rec-pim" id="dest-pic-rec-pim-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-pic-rec-pim-{{m.idMuestra}}">
+                                                                                        Pimienta
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--Pungente-->
+                                                                            <label for=""><b>Picante, Pungente</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic-pun-cla" id="dest-pic-pum-cla-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-pic-pum-cla-{{m.idMuestra}}">
+                                                                                        Clavo de Olor
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-pic-pun-tom" id="dest-pic-pum-tom-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-pic-pum-tom-{{m.idMuestra}}">
+                                                                                        Tomillo
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>                                                     
+                                                                        </div>
+                                                                        <br>
+                                                                        <!--Destilacion, Carbonil, Ahumado, Ceniza-->
+                                                                        <div class="ps-4">
+                                                                            
+                                                                            <!--Ahumado-->  
+                                                                            <label for=""><b>Carbonil, Ahumado</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car-ahu-alq" id="dest-car-ahu-alq-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-car-ahu-alq-{{m.idMuestra}}">
+                                                                                        Alquitrán
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car-ahu-tab" id="dest-car-ahu-tab-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-car-ahu-tab-{{m.idMuestra}}">
+                                                                                        Tabaco
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--Ceniza-->
+                                                                            <label for=""><b>Carbonil, Ceniza</b></label>
+                                                                            <div class="row">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car-cen-que" id="dest-car-cen-que-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-car-cen-que-{{m.idMuestra}}">
+                                                                                        Quemado
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="aromas" value="dest-car-cen-carb" id="dest-car-cen-carb-{{m.idMuestra}}">
+                                                                                    <label class="form-check-label" for="dest-car-cen-carb-{{m.idMuestra}}">
+                                                                                        Carbonizado
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>                                                     
+                                                                        </div>
+                                                                        <br>   
+                                                                </div>
+                                                                    
+                                                        
+                                                                    <div class="col-5 text-end">
+                                                                        <img src="/static/svg/aromas-completo.svg" class="img100" >
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-indicator btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                            <button class="btn btn-danger btn-rounded" data-bs-target="#aromas-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <a type="button" class="btn btn-warning btn-rounded btn-sm" data-bs-toggle="modal" href="#aromas-{{m.idMuestra}}" role="button">+</a>
+                                        </div>  
+                                        <!--Dulzor-->
+                                        <div class="py-2 ">
+                                            <label for="dulzor">Dulzor</label>
+                                            <input type="number" form="sensorial-{{m.idMuestra}}" max=10 min=0  onkeyup="validate10(event);" name="dulzor" id="dulzor">
+                                        </div>
+                                        <!--Comentarios-->
+                                        <div class="py-2 div-comment">
+                                            <label for="comentarios">Comentarios</label>
+                                            <textarea name="comentarios" id="comentarios" form="sensorial-{{m.idMuestra}}" cols="30" rows="4"></textarea>
+                                        </div>
+                                        <!--Catador-->
+                                        <div class="py-3">
+                                            <label class="form-label text-black" for="nameCatador-{{m.idMuestra}}">Catador</label>
+                                            <div class="input-group mb-3">
+                                                <input form="sensorial-{{m.idMuestra}}" class="form-control" type="text" id="nameCatador-{{m.idMuestra}}" name="nameCatador" value="{{catador}}" disabled required autocomplete="off" >
+                                            </div>
+                                            <label class="form-label text-black" for="puntajeCatador">Puntaje</label>
+                                            <input form="sensorial-{{m.idMuestra}}" type="number" id="puntajeCatador" name="puntajeCatador" onkeyup="validate10(event);" required autocomplete="off" max=10 min=0>
+                                        </div>
+                                    </div>
+                                    <!--Columna 2-->
+                                    <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 py-2">
+                                        <!--Nivel de tueste-->
+                                        <div class="py-2"> 
+                                            <label for="">Nivel de tueste</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name ="nTueste" type="radio" value="1" id="Talto-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Talto-{{m.idMuestra}}">Alto</label>
+                                            </div>
+                        
+                                            <div class="form-check">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name ="nTueste" type="radio" value="2" id="Tmedio-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Tmedio-{{m.idMuestra}}">Medio</label>
+                                            </div>
+                        
+                                            <div class="form-check">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name ="nTueste" type="radio" value="3" id="Tbajo-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Tbajo-{{m.idMuestra}}">Bajo</label>
+                                            </div>
+                                        </div>
+                                        <!--Sabor MODAL-->
+                                        <div class="py-2">
+                                            <label for="sabor">Sabor</label><br>
+                                            <input form="sensorial-{{m.idMuestra}}" class="w-50" type="number" name="pSabor" id="pSabor" onkeyup="validate10(event);" max=10 min=0 >
+                                            <!--sabor-{{m.idMuestra}}-->
+                        
+                                            <div class="modal fade" id="sabores-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="sabores-{{m.idMuestra}}-ModalLabel" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="sabores-{{m.idMuestra}}-ModalLabel">Sabores</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row justify-content-center align-items-center h-100">
+                                                                <div class="text-center">
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#SaborNivel1-{{m.idMuestra}}" data-bs-toggle="modal">+</button>
+                                                                    <label for="sabor">Nivel I</label><br>
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#SaborNivel2-{{m.idMuestra}}" data-bs-toggle="modal">+</button>
+                                                                    <label for="sabor">Nivel II</label><br>
+                                                                    <button class="btn btn-warning btn-rounded btn-sm mb-3" data-bs-target="#SaborNivel3-{{m.idMuestra}}" data-bs-toggle="modal">+</button>
+                                                                    <label for="sabor">Nivel III</label><br>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel I-->
+                                                <div class="modal fade" id="SaborNivel1-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="SaborNivel1-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="SaborNivel1-{{m.idMuestra}}-Label">Sabores</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row justify-content-center align-items-center h-100">
+                                                                <h5>Nivel I</h5>
+                                                                <div class="col-2 ps-4">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="dul" id="dul-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="dul-{{m.idMuestra}}">
+                                                                            Dulce
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac" id="ac-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="ac-{{m.idMuestra}}">
+                                                                            Ácido
+                                                                        </label>
+                                                                    </div>                                                   
+                                                                </div>
+                                                                <div class="col-2 ps-4">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal" id="sal-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="sal-{{m.idMuestra}}">
+                                                                            Salado
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am" id="am-{{m.idMuestra}}">
+                                                                        <label class="form-check-label" for="am-{{m.idMuestra}}">
+                                                                            Amargo
+                                                                        </label>
+                                                                    </div>  
+                        
+                                                                </div>
+                                                                <div class="col-8 text-center">
+                                                                    <img src="/static/svg/sabores-completo.svg" class="imgComplete" >
+                                                                </div>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-indicator btn-rounded" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                        <button class="btn btn-danger btn-rounded" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel II-->
+                                                <div class="modal fade" id="SaborNivel2-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="SaborNivel2-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="SaborNivel2-{{m.idMuestra}}-Label">Sabores</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row justify-content-center align-items-center h-100">
+                                                                <h5>Nivel II</h5>
+                                                                <div class="col-1 me-5">
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Dulce</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="dul-ac" id="dul-ac-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="dul-ac-{{m.idMuestra}}">
+                                                                                Ácido
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="dul-mel" id="dul-mel-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="dul-mel-{{m.idMuestra}}">
+                                                                                Meloso
+                                                                            </label>
+                                                                        </div>                                                   
+                                                                    </div>
+                                                                    <br>
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Ácido</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac-av" id="ac-av-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="ac-av-{{m.idMuestra}}">
+                                                                                Avinado
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac-ag" id="ac-ag-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="ac-ag-{{m.idMuestra}}">
+                                                                                Agrio
+                                                                            </label>
+                                                                        </div>                                                   
+                                                                    </div>
+                                                                    <br>
+                        
+                                                                </div>
+                                                                <div class="col-1 me-5">
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Salado</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal-sos" id="sal-sos-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="sal-sos-{{m.idMuestra}}">
+                                                                                Soso
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal-af" id="sal-af-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="sal-af-{{m.idMuestra}}">
+                                                                                Afilado
+                                                                            </label>
+                                                                        </div>                                                   
+                                                                    </div>
+                                                                    <br>
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Amargo</b></label>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am-as" id="am-as-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="am-as-{{m.idMuestra}}">
+                                                                                Aspero
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am-pun" id="am-pun-{{m.idMuestra}}">
+                                                                            <label class="form-check-label" for="am-pun-{{m.idMuestra}}">
+                                                                                Pungente
+                                                                            </label>
+                                                                        </div>                                                   
+                                                                    </div>
+                                                                    <br>
+                        
+                                                                </div>
+                                                                <div class="col-8 text-center">
+                                                                    <img src="/static/svg/sabores-completo.svg" class="imgComplete" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-indicator btn-rounded" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                        <button class="btn btn-danger btn-rounded" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <!--Nivel III-->
+                                                <div class="modal fade" id="SaborNivel3-{{m.idMuestra}}" aria-hidden="true" aria-labelledby="SaborNivel3-{{m.idMuestra}}-Label" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="SaborNivel3-{{m.idMuestra}}-Label">Sabores</h5>
+                                                        <button type="button" class="btn-close" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row justify-content-center align-items-center h-100">
+                                                                <h5>Nivel III</h5>
+                                                                <div class="col-1 me-5">
+                                                                    <!--Dulce-->
+                                                                    <div class="ps-4">
+                                                                        <label for="dulce"><b>Dulce</b></label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="dul-ac-pi" id="dul-ac-pi-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dul-ac-pi-{{m.idMuestra}}">
+                                                                                    Picante
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="dul-ac-li" id="dul-ac-li">
+                                                                                <label class="form-check-label" for="dul-ac-li-{{m.idMuestra}}">
+                                                                                    Ligero
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="d-m-equilibrado" id="d-m-equilibrado-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="d-m-equilibrado-{{m.idMuestra}}">
+                                                                                    Equilibrado
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="dul-mel-del" id="dul-me-del-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="dul-me-del--{{m.idMuestra}}">
+                                                                                    Delicado
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>                                                  
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Salado-->
+                                                                    <div class="ps-4">
+                                                                        <label for="salado"><b>Salado</b></label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal-sos-sua" id="sal-sos-sua-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="sal-sos-sua-{{m.idMuestra}}">
+                                                                                    Suave
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal-sos-neu" id="sal-sos-neu-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="sal-sos-neu-{{m.idMuestra}}">
+                                                                                    Neutro
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal-af-asp" id="sal-sos-neu-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="sal-af-asp-{{m.idMuestra}}">
+                                                                                    Áspero
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="sal-af-ast" id="sal-af-ast-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="sal-af-ast-{{m.idMuestra}}">
+                                                                                    Astringente
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>                                                  
+                                                                    </div>
+                                                                    <br>
+                        
+                                                                </div>
+                                                                <div class="col-1 me-5">
+                                                                    <!--Acido-->
+                                                                    <div class="ps-4">
+                                                                        <label for="salado"><b>Ácido</b></label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac-av-ta" id="ac-av-ta-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="ac-av-ta-{{m.idMuestra}}">
+                                                                                    Tánico
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac-av-tar" id="ac-av-ta-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="ac-av-tar-{{m.idMuestra}}">
+                                                                                    Tartánico
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac-ag-du" id="ac-av-ta-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="ac-ag-du-{{m.idMuestra}}">
+                                                                                    Duro
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="ac-ag-acre" id="ac-ag-acre-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="ac-ag-acre-{{m.idMuestra}}">
+                                                                                    Acre
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>                                                  
+                                                                    </div>
+                                                                    <br>
+                                                                    <!--Amargo-->
+                                                                    <div class="ps-4">
+                                                                        <label for="amargo"><b>Amargo</b></label>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am-as-alca" id="am-as-alca-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="am-as-alca-{{m.idMuestra}}">
+                                                                                    Alcalino
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am-as-cau" id="am-as-cau-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="am-as-cau-{{m.idMuestra}}">
+                                                                                    Cáustico
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am-pun-cr" id="am-pum-cr-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="am-pum-cr-{{m.idMuestra}}">
+                                                                                    Creosol
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" type="checkbox" name="sabores" value="am-pun-fen" id="am-pum-fen-{{m.idMuestra}}">
+                                                                                <label class="form-check-label" for="am-pum-fen-{{m.idMuestra}}">
+                                                                                    Fenólico
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>                                                  
+                                                                    </div>
+                                                                    <br>
+                        
+                                                                </div>
+                                                    
+                                                                <div class="col-8 text-center">
+                                                                    <img src="/static/svg/sabores-completo.svg" class="imgComplete" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-indicator btn-rounded" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal">Guardar</button>
+                                                        <button class="btn btn-danger btn-rounded" data-bs-target="#sabores-{{m.idMuestra}}" data-bs-toggle="modal">Regresar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <a type="button" class="btn btn-warning btn-rounded btn-sm" data-bs-toggle="modal" href="#sabores-{{m.idMuestra}}" role="button">+</a>
+                        
+                                    
+                                        </div> 
+                                        <!--Taza limpia-->
+                                        <div class="py-2">
+                                            <label for="tLimpia">Taza limpia</label>
+                                            <input type="number" form="sensorial-{{m.idMuestra}}" max=10 min=0  onkeyup="validateint(event);" name="tLimpia" id="tLimpia">
+                                        </div>                        
+                                        <!--Remanente-->
+                                        <div class="py-2">
+                                            <label for="remanente">Remanente</label>
+                                            <input type="number" form="sensorial-{{m.idMuestra}}" max=10 min=0 name="remanente" onkeyup="validate10(event);" id="remanente">
+                                        </div>
+                                        <!--Acidez-->
+                                        <div class="py-2">
+                                            <label for="acidez">Acidez</label>
+                                            <input type="number" form="sensorial-{{m.idMuestra}}" max=10 min=0 name="acidez" onkeyup="validate10(event);" id="acidez">
+                                        </div>
+                                    </div>
+                                    <!--Columna 3-->
+                                    <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 py-2 pe-4">
+                                        <!--Nivel de molienda-->
+                                        <div class="py-2">
+                                            <label for="">Nivel de molienda</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name="nMolienda" type="radio" value="1" id="Malto-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Malto-{{m.idMuestra}}">Alto</label>
+                                            </div>
+                        
+                                            <div class="form-check">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name="nMolienda" type="radio" value="2" id="Mmedio-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Mmedio-{{m.idMuestra}}">Medio</label>
+                                            </div>
+                        
+                                            <div class="form-check">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name="nMolienda" type="radio" value="3" id="Mbajo-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Mbajo-{{m.idMuestra}}">Bajo</label>
+                                            </div>
+                                        </div>
+                                        <!--Tazas defectuosas-->
+                                        <div class="py-2">
+                                            <label for="tDefectuosas">Tazas defectuosas</label>
+                                            <input type="number" form="sensorial-{{m.idMuestra}}" max=10 min=0 name="tDefectuosas" onkeyup="validateint(event);" id="tDefectuosas"><br>
+                                        </div>
+                                        <!--Cuerpo-->
+                                        <div class="py-2">
+                                            <label for="cuerpo">Cuerpo</label>
+                                            <input type="number" form="sensorial-{{m.idMuestra}}" max=10 min=0 name="cuerpo" id="cuerpo" onkeyup="validate10(event);">
+                                        </div>
+                                        <!--Intensidad-->
+                                        <div class="py-2">
+                                            <p>Intensidad</p>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name="intensidad" type="radio" value="1" id="Ialto-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Ialto-{{m.idMuestra}}">Alto</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name ="intensidad" type="radio" value="2" id="Imedio-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Imedio-{{m.idMuestra}}">Medio</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" form="sensorial-{{m.idMuestra}}" name ="intensidad" type="radio" value="3" id="Ibajo-{{m.idMuestra}}" />
+                                                <label class="form-check-label" for="Ibajo-{{m.idMuestra}}">Bajo</label>
+                                            </div>
+                                        </div>
+                                        <!--Uniformidad-->
+                                        <div class="py-2">
+                                            <label for="uniformidad">Uniformidad</label>
+                                            <input type="number" class="mb-5" form="sensorial-{{m.idMuestra}}" name="uniformidad" id="uniformidad" max=10 min=0 onkeyup="validate10(event);">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row px-0">
+                                    <div class="col-12 text-center doneButton px-0">
+                                        <a href="javascript:void(0);" onclick="saveSensorial(event,'{{m.idMuestra}}');" class="btn my-0 py-0 w-100 px-0">
+                                            <span class="fas fa-check compact" style="font-size: 2rem; color: white;"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %} 
+                  <!--Buttons-->
+                    <div class="d-grid d-md-flex justify-content-md-end" id="botones-p3">
+                      <!--Back Button-->
+                      <button class="btn btn-outline-danger me-md-2" type="button" onclick="clic1();">Regresar</button>
+                      <!--Next Button-->
+                      <a class="btn btn-outline-success me-2" href="{% url 'verPuntaje' idAnalisis %}">Finalizar</a>
+                    </div>               
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}

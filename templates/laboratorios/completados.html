@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/orden.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<!-- https://listjs.com/ -->
+<script src="{% static 'scripts/list.min.js' %}"></script>
+<script src="{% static 'scripts/muestras.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    : Ver Resultados
+{% endblock %}
+
+{% block main %}
+<div class="container py-5 ps-sm-5">
+    <div class="row justify-content-center align-items-center h-100 py-3">
+        <div class="col-6 text-start">
+            <p class="fs-2">Revision de resultados</p>
+        </div> 
+        <div class="col-6 text-end">
+          <form action="{% url 'verResultadosMuestraLab' %}" method="POST" id="verMuestras">
+              {% csrf_token %}
+                
+            </form>
+            <button type="submit" class="btn savebtn" form="verMuestras">Ver Resultados</button>
+      </div>
+    </div>
+
+    <div class="accordion accordion-flush" id="accordionFlushExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingOne">
+          <button
+            class="accordion-button"
+            type="button"
+            data-mdb-toggle="collapse"
+            data-mdb-target="#flush-collapseOne"
+            aria-expanded="true"
+            aria-controls="flush-collapseOne"
+          >
+          Analisis Completados
+            
+          </button>
+        </h2>
+        <div
+          id="flush-collapseOne"
+          class="accordion-collapse collapse show"
+          aria-labelledby="flush-headingOne"
+          data-mdb-parent="#accordionFlushExample"
+        >
+          <div class="accordion-body" class="table-responsive">
+            <table class="table table-striped table-hover text-center">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col" class="sort" data-sort="codigo">Codigo</th>
+                  <th scope="col"class="sort" data-sort="peso">Peso</th>
+                  <th scope="col" class="sort" data-sort="procesamiento">Procesamiento</th>
+                  <th scope="col" class="sort" data-sort="presentacion">Presentación</th>
+                  <th scope="col" class="sort" data-sort="fecha">Fecha Entrega</th>
+                  <th scope="col" class="sort" data-sort="repetir">Repetida</th>
+                  <th scope="col">Revisar</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                  {% if muestrasCompletadas %}
+                      {% for m in muestrasCompletadas %}
+                      <tr id="m-{{m.idMuestra}}" class="align-middle">
+                          <th scope="row" class="codigo" id="codigo-{{m.idMuestra}}">{{m.idMuestra}}</th>
+                          <td class="peso" id="peso-{{m.idMuestra}}">{{m.peso|floatformat:-2}}gr</td>
+                          <td class="proceso" id="proceso-{{m.idMuestra}}">{{m.get_procesado_display}}</td>
+                          <td class="presentacion" id="presentacion-{{m.idMuestra}}">{{m.get_tipo_display}}</td>
+                          <td class="fecha" id="fecha-{{m.idMuestra}}">{{m.fechaEntrega}}</td>
+                          <td class="repetir" id="repetir-{{idMuestra}}">{% if m.repetir == False %} No {% else %} Si {% endif %}</td>
+                          <td class="analizar">
+                            <input class="form-check-input" type="checkbox" value="{{m.idMuestra}}" name="vMuestra" form="verMuestras">
+                    </td>
+                      </tr>
+                      {% endfor %}
+                  {% else %}
+                <tr>
+                  <td colspan="8">NO HAY DATOS QUE MOSTRAR</td>
+                </tr>
+                {% endif %}
+              </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+</div>
+{% endblock %}

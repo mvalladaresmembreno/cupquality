@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es-es">
+<head>
+    {% load static %}
+    {% load jsignature_filters %}
+    {% load get_tamizado %}
+    {% load get_defectos %}
+    {% load get_sabores_aromas %}
+    {% load utilidades %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="#">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- MDB -->
+    <link href="{% static 'css/mdb/mdb.min.css' %}" rel="stylesheet"/>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="{% static 'css/impresion.css' %}">
+    <link rel="stylesheet" href="{% static '/css/homeAnalisis.css' %}">
+    <link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+    <title>Calidad de Taza: Resultados</title>
+    <style >
+        @media print {
+            header{
+                top: 0 !important;
+                padding: top !important;
+                position: unset !important;
+            }   
+            .no-print{
+            display: none;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="row justify-content-between align-items-center bg-transparent text-center py-2 w-100 mx-0">
+            <div class="col-4 text-center "><img class="bannerImg" src="{% static 'svg/solidaridad-logo-impresion.svg' %}" ></div>
+            <div class="col-4 text-center ">
+                <strong class="navbar-brand loggedoutnav">Calidad de Taza</strong>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid mt-3">
+        <div class="row  w-100 mx-auto justify-content-center align-items-center flex-wrap px-0">
+            <div class="col-6 text-center mb-3">
+                <h4>Perfil de Muestra: {{s.fkMuestra.idMuestra}}</h4>
+            </div>
+            <div class="col-6 text-center mb-3">
+                <strong>
+                    Puntaje General
+                </strong>
+                <h4>
+                    {{s.pFinal}}
+                </h4>
+            </div>
+
+        </div>
+        <div class="row w-100 mx-auto justify-content-center align-items-center flex-wrap mb-3 px-0">
+
+            <div class="col-7"> 
+              <canvas id="polar-{{s.fkMuestra.idMuestra}}">
+                
+              </canvas>
+            </div>
+        </div>
+        <div class="row w-100 mx-auto justify-content-center align-items-center flex-wrap px-0">
+            <div class="col-4 text-center mb-3">
+                <h5>Lt: {{s.fkMuestra.fkLote.nameLote}}</h5>
+            </div>
+            <div class="col-4 text-center mb-3">
+                <h5>Fca: {{s.fkMuestra.fkLote.fkFinca.nameFinca}}</h5>
+            </div>
+            <div class="col-4 text-center mb-3">
+                <h5>Prod: {{s.fkMuestra.fkLote.fkFinca.fkProd}}</h5>
+            </div>
+        </div>
+        <div class="row w-100 mx-auto justify-content-between align-items-center flex-wrap mb-3 px-0">
+
+            <div class="col-4 text-center"> 
+                <h3>Defectos</h3>  
+            </div>
+            <div class="col-4 text-center me-3 no-print">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="CheckRec"/>
+                    <label class="form-check-label" for="CheckRec">Incluir recomendaciones manualmente</label>
+                </div>
+            </div>
+        </div>
+        <div class="row w-100 mx-auto justify-content-center align-items-center flex-wrap ps-5">
+            <div class="col-12">  
+                <ul>
+                    {% for d in defectos %}
+                    <li class="defectos mb-3"> {{d}}
+                        <ul class="recomendaciones">
+                            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. </li>
+                            <li>Numquam perspiciatis fugiat, esse ab quaerat non ipsa eveniet</li>
+                            <li>velit perferendis possimus quidem sapiente quos aspernatur libero dolorum, </li>
+                            <li>alias excepturi, molestiae odit?</li>
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+            
+            </div>
+        </div>
+
+
+    </div>
+    <footer>
+        <div class="text-center text-muted fw-bold footerProd footerColor p-2 pb-0">
+          © 2023 Copyright: Powered by Solidaridad Network
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.1.0"></script>
+    <script>
+        let info={};
+        info[{{s.fkMuestra.idMuestra}}] = { Fragancia:{{s.fragancia}} , Sabor: {{s.pSabor}} , Acidez: {{s.acidez}} , Cuerpo: {{s.cuerpo}} , Remanente: {{s.remanente}} , Uniformidad: {{s.pUniformidad}} , Balance: {{s.balance}} , TazaLimpia: {{s.pTLimpia}} , Dulzor: {{s.pDulzor}} , Catador: {{s.pCatador}} };
+    </script>
+    <script src="{% static '/scripts/verResultados.js' %}" ></script>
+    <script>
+
+                let radar = document.getElementById('polar-{{s.fkMuestra.idMuestra}}').getContext('2d');
+                let graph = radar.canvas.toDataURL();
+                let image = new Image();
+                image.src = graph;
+                radar.drawImage(image,0,0);
+    </script>
+    <script src="{% static '/scripts/rec.js' %}"></script>
+</body>
+</html>

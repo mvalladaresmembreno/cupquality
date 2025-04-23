@@ -1,0 +1,1215 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/homeAnalisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static '/scripts/hAnalisis.js'%}"></script>
+{% endblock %}
+
+{% block title %}
+    : Análisis Físico
+{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+  <div class="row mb-3">
+    <div class="col-6 text-start">
+      <h3>Análisis Físico</h3>
+    </div>
+  </div>
+  <div class="card border-0 shadow-none mx-auto">
+      <!-- Tabs navs -->
+      <ul class="nav nav-tabs mb-3" id="muestras" role="tablist">
+        {% for m in muestras %}
+          {% if forloop.first %}
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="muestra-{{m.idMuestra}}" data-mdb-toggle="tab" href="#muestras-{{m.idMuestra}}" role="tab" aria-controls="muestras-{{m.idMuestra}}" aria-selected="true">Muestra {{m.idMuestra}}</a>
+          </li>
+          {% else %}
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="muestra-{{m.idMuestra}}" data-mdb-toggle="tab" href="#muestras-{{m.idMuestra}}" role="tab" aria-controls="muestras-{{m.idMuestra}}" aria-selected="true">Muestra {{m.idMuestra}}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <!-- Tabs content -->
+      <div class="tab-content" id="muestras-content">
+        {% for m in muestras %}
+          {% if forloop.first %}
+          <div class="tab-pane fade show active" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+            <input type="hidden" name="peso-{{m.idMuestra}}" value="{{m.peso}}" id="peso-{{m.idMuestra}}">
+            <div class="">
+              <div class="card-header">
+                <div class="row justify-content-between align-items-center text-center">
+                    <div class="col-2 text-center">
+                        <b>Muestra: {{ m.idMuestra }}</b>
+                    </div>
+                    <div class="col-3" >
+                      <b>Granos Defectuosos (gr): </b> <span id="pDefectos-D-{{m.idMuestra}}">0</span>
+                      <input type="hidden" name="pDefectos" id="pDefectos-{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min=0 value="0" readonly>
+                    </div>
+                    <div class="col-3" >
+                        <b>Granos Defectuosos (%): </b><span id="por-{{m.idMuestra}}">0%</span>
+                        <input type="hidden" name="porDefectos" id="POR_D_{{m.idMuestra}}" value="0"  form="addFisico_{{m.idMuestra}}">
+                    </div>
+                    <div class="col-4">
+                      <div class="input-group">
+                          <select class="form-select" id="sAnalisis" aria-label="Sede Análisis" name="sAnalisis" form="addFisico_{{m.idMuestra}}" required>
+                              <option value="" default>Seleccione sede</option>
+                              {% for s in sedes %}
+                                <option value="{{s.id_sede}}">{{s.name_sede}}</option>
+                              {% endfor %}
+                          </select>
+                      </div>
+                    </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="container-fluid table-responsive">
+                  <!-- Tabs navs -->
+                    <ul class="nav nav-tabs mb-3" id="fisico-{{m.idMuestra}}" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="tamiz-{{m.idMuestra}}" data-mdb-toggle="tab" href="#tamizados-{{m.idMuestra}}" role="tab" aria-controls="tamizados-{{m.idMuestra}}" aria-selected="true">TAMIZADO</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="defectos1-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto1-{{m.idMuestra}}" role="tab" aria-controls="defecto1-{{m.idMuestra}}" aria-selected="false">DEFECTOS 1</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="defectos2-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto2-{{m.idMuestra}}" role="tab" aria-controls="defecto2-{{m.idMuestra}}" aria-selected="false">DEFECTOS 2</a>
+                      </li>
+                    </ul>
+              
+                    <!-- Tabs content -->
+                    <div class="tab-content" id="fisico-{{m.idMuestra}}-content">
+                      <div class="tab-pane fade show active" id="tamizados-{{m.idMuestra}}" role="tabpanel" aria-labelledby="tamiz-{{m.idMuestra}}">
+                        <table class="table table-striped">
+                            <td class="">
+                              <label class="form-label" for="PORhumedad_{{m.idMuestra}}">Humedad</label>
+                              <input class="form-control" type="number" name="PORhumedad" id="PORhumedad_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0">
+                            </td>
+                            <td class="">
+                              <label class="form-label" for="temp_{{m.idMuestra}}">Temp. Analisis</label>
+                              <input class="form-control" type="number" name="temp" id="temp_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0">
+                            </td>
+                            {% if m.tipo == 1 %}
+                            <td class="">
+                              <label class="form-label" for="rend_{{m.idMuestra}}">Rendimiento</label>
+                              <input class="form-control" type="number" name="rend" id="rend_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0">
+                            </td>
+                            {% endif %}
+                        </table>
+                        <table class="table table-striped">
+                          <thead>
+                            <tr class="justify-content-between align-items-center">
+                              <th scope="col">Determinación de Tamaños</th>
+                              <th scope="col" tabindex="0" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, el proceso de tamizado debe ser realizado con 300gr">
+                                <select class="select" data-muestra="{{m.idMuestra}}" name="pesoTamiz" id="pesoTamiz_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}">
+                                  <option value="50">50gr</option>
+                                  <option value="100" {% if m.peso|floatformat:"0" <= "100" %} selected {% endif %}>100gr</option>
+                                  {% if m.peso|floatformat:"0" >= "300" %}
+                                  <option value="200">200gr</option>
+                                  <option value="300" selected>300gr</option>
+                                  {% endif %}
+                                </select>
+                              </th>
+                              <th scope="col">% de Retención = PCix / PM * 100</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Criba 20</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC20" id="PC20_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC20" id="POR_PC20_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 19</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC19" id="PC19_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC19" id="POR_PC19_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 18</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC18" id="PC18_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC18" id="POR_PC18_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 17</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC17" id="PC17_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC17" id="POR_PC17_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 16</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC16" id="PC16_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC16" id="POR_PC16_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 15</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC15" id="PC15_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC15" id="POR_PC15_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 14</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC14" id="PC14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC14" id="POR_PC14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Debajo de Criba 14</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC-14" id="PC-14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC-14" id="POR_PC-14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TOTAL</td>
+                              <td>
+                                <input class="w-75" type="number" name="PCtotal" id="PCtotal_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="PORtotal" id="PORtotal_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="defecto1-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos1-{{m.idMuestra}}">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Defecto</th>
+                                <th scope="col">Encontrados</th>
+                                <th scope="col">N° de Defectos</th>
+                                <th scope="col">Peso de Imperfecciones (gr)</th>
+                                <th scope="col">% de Imperfecciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="NGRT" id="NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Negro Total</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRT" id="E_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRT" id="D_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRT" id="P_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRT" id="POR_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="AGT" id="AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Agrio Total</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AGT" id="E_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AGT" id="D_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AGT" id="P_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AGT" id="POR_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="VC" id="VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Vaina/Cereza</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_VC" id="E_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_VC" id="D_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_VC" id="P_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_VC" id="POR_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row" tabindex="1" data-mdb-container="body" data-mdb-placement="left" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, si existen piedras deberá rechazarse la muestra">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRGR" id="PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Piedras Grandes</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRGR" id="E_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRGR" id="D_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRGR" id="P_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRGR" id="POR_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row" tabindex="1" data-mdb-container="body" data-mdb-placement="left" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, si existen piedras deberá rechazarse la muestra">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRMD" id="PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Piedras Medianas</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRMD" id="E_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRMD" id="D_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRMD" id="P_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRMD" id="POR_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLGR" id="PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Palos Grandes</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLGR" id="E_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLGR" id="D_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLGR" id="P_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLGR" id="POR_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLMD" id="PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Palos Medianos</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLMD" id="E_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLMD" id="D_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLMD" id="P_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLMD" id="POR_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              
+                              
+                            </tbody>
+                          </table>
+                      </div>
+                      <div class="tab-pane fade" id="defecto2-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos2-{{m.idMuestra}}">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Defecto</th>
+                                <th scope="col">Encontrados</th>
+                                <th scope="col">N° de Defectos</th>
+                                <th scope="col">Peso de Imperfecciones (gr)</th>
+                                <th scope="col">% de Imperfecciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PRG" id="PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Pergamino</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PRG" id="E_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PRG" id="D_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PRG" id="P_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PRG" id="POR_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CSCR" id="CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Cascara</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CSCR" id="E_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CSCR" id="D_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CSCR" id="P_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CSCR" id="POR_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="RTAT" id="RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Roto/Astillado</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_RTAT" id="E_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_RTAT" id="D_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_RTAT" id="P_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_RTAT" id="POR_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPI" id="DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Daños por insectos</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPI" id="E_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPI" id="D_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPI" id="P_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPI" id="POR_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="NGRP" id="NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Negro parcial</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRP" id="E_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRP" id="D_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRP" id="P_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRP" id="POR_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="AMGP" id="AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Amargo parcial</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AMGP" id="E_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AMGP" id="D_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AMGP" id="P_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AMGP" id="POR_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="FL" id="FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Flotador</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_FL" id="E_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_FL" id="D_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_FL" id="P_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_FL" id="POR_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CNCH" id="CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Concha</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CNCH" id="E_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CNCH" id="D_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CNCH" id="P_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CNCH" id="POR_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                              <tr>
+                                <td scope="row" tabindex="1" data-mdb-container="body" data-mdb-placement="left" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, si existen piedras deberá rechazarse la muestra">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PDRPQ" id="PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Piedras pequeñas</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRPQ" id="E_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRPQ" id="D_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRPQ" id="P_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRPQ" id="POR_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PLPQ" id="PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Palos pequeños</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLPQ" id="E_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLPQ" id="D_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLPQ" id="P_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLPQ" id="POR_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPA" id="DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Daños por agua</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPA" id="E_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPA" id="D_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPA" id="P_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPA" id="POR_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <div class="row px-0 justify-content-end align-items-end me-1">
+                            <div class="col-1 text-center px-0">
+                              <a id="save-{{m.idMuestra}}" href="javascript:void(0);" onclick="saveFisica(event,{{m.idMuestra}});" class="btn btn-success w-100 px-0" form="addFisico_{{m.idMuestra}}">
+                              <i class="fas fa-check fa-2xl"></i>
+                              </a>
+                            </div> 
+                        </div>  
+                      </div>
+                    </div>            
+                
+                    <div class="row justify-content-end align-items-end">
+                      <div class="col-3 text-center doneButton px-0">
+                          <form onsubmit="saveFisica(event, {{m.idMuestra}})" id="addFisico_{{m.idMuestra}}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="idMuestra" value="{{m.idMuestra}}">
+                          </form>
+                      </div> 
+                  </div>  
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="tab-pane fade" id="muestras-{{m.idMuestra}}" role="tabpanel" aria-labelledby="muestra-{{m.idMuestra}}">
+            <input type="hidden" name="peso-{{m.idMuestra}}" value="{{m.peso}}" id="peso-{{m.idMuestra}}"> <!-- CAMBIAR PESOOOOO -->
+            <div class="">
+              <div class="card-header">
+                <div class="row justify-content-between align-items-center text-center">
+                  <div class="col-2 text-center">
+                      <b>Muestra: {{ m.idMuestra }}</b>
+                  </div>
+                  <div class="col-3" >
+                    <b>Granos Defectuosos (gr): </b> <span id="pDefectos-D-{{m.idMuestra}}">0</span>
+                    <input type="hidden" name="pDefectos" id="pDefectos-{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min=0 value="0" readonly>
+                  </div>
+                  <div class="col-3" >
+                      <b>Granos Defectuosos (%): </b><span id="por-{{m.idMuestra}}">0%</span>
+                      <input type="hidden" name="porDefectos" id="POR_D_{{m.idMuestra}}" value="0"  form="addFisico_{{m.idMuestra}}">
+                  </div>
+                  <div class="col-4">
+                    <div class="input-group">
+                        <select class="form-select" id="sAnalisis" aria-label="Sede Análisis" name="sAnalisis" form="addFisico_{{m.idMuestra}}" required>
+                            <option value="" default>Seleccione sede</option>
+                            {% for s in sedes %}
+                              <option value="{{s.id_sede}}">{{s.name_sede}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="container-fluid table-responsive">
+                  <!-- Tabs navs -->
+                    <ul class="nav nav-tabs mb-3" id="fisico-{{m.idMuestra}}" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="tamiz-{{m.idMuestra}}" data-mdb-toggle="tab" href="#tamizados-{{m.idMuestra}}" role="tab" aria-controls="tamizados-{{m.idMuestra}}" aria-selected="true">TAMIZADO</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="defectos1-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto1-{{m.idMuestra}}" role="tab" aria-controls="defecto1-{{m.idMuestra}}" aria-selected="false">DEFECTOS 1</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="defectos2-{{m.idMuestra}}" data-mdb-toggle="tab" href="#defecto2-{{m.idMuestra}}" role="tab" aria-controls="defecto2-{{m.idMuestra}}" aria-selected="false">DEFECTOS 2</a>
+                      </li>
+                    </ul>
+              
+                    <!-- Tabs content -->
+                    <div class="tab-content" id="fisico-{{m.idMuestra}}-content">
+                      <div class="tab-pane fade show active" id="tamizados-{{m.idMuestra}}" role="tabpanel" aria-labelledby="tamiz-{{m.idMuestra}}">
+                        <table class="table table-striped">
+                          <td class="">
+                            <label class="form-label" for="PORhumedad_{{m.idMuestra}}">Humedad</label>
+                            <input class="form-control" type="number" name="PORhumedad" id="PORhumedad_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0">
+                          </td>
+                          <td class="">
+                            <label class="form-label" for="temp_{{m.idMuestra}}">Temp. Analisis</label>
+                            <input class="form-control" type="number" name="temp" id="temp_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0">
+                          </td>
+                        {% if m.tipo == 1 %}
+                        <td class="">
+                          <label class="form-label" for="rend_{{m.idMuestra}}">Rendimiento</label>
+                          <input class="form-control" type="number" name="rend" id="rend_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0">
+                        </td>
+                        {% endif %}
+                        </table>
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th scope="col">Determinación de Tamaños</th>
+                              <th scope="col" tabindex="0" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, el proceso de tamizado debe ser realizado con 300gr">
+                                <select class="select" data-muestra="{{m.idMuestra}}" name="pesoTamiz" id="pesoTamiz_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}">
+                                  <option value="50">50gr</option>
+                                  <option value="100" {% if m.peso|floatformat:"0" <= "100" %} selected {% endif %}>100gr</option>
+                                  {% if m.peso|floatformat:"0" >= "300" %}
+                                  <option value="200">200gr</option>
+                                  <option value="300" selected>300gr</option>
+                                  {% endif %}
+                                </select>
+                              </th>
+                              <th scope="col">% de Retención = PCix / PM * 100</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Criba 20</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC20" id="PC20_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC20" id="POR_PC20_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 19</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC19" id="PC19_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC19" id="POR_PC19_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 18</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC18" id="PC18_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC18" id="POR_PC18_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 17</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC17" id="PC17_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC17" id="POR_PC17_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 16</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC16" id="PC16_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC16" id="POR_PC16_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 15</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC15" id="PC15_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC15" id="POR_PC15_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Criba 14</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC14" id="PC14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC14" id="POR_PC14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Debajo de Criba 14</td>
+                              <td>
+                                <input class="w-75 tamizados" data-muestra="{{m.idMuestra}}" type="number" name="PC-14" id="PC-14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="POR_PC-14" id="POR_PC-14_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TOTAL</td>
+                              <td>
+                                <input class="w-75" type="number" name="PCtotal" id="PCtotal_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" value="0">
+                              </td>
+                              <td>
+                                <input class="w-75" type="number" name="PORtotal" id="PORtotal_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="defecto1-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos1-{{m.idMuestra}}">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Defecto</th>
+                                <th scope="col">Encontrados</th>
+                                <th scope="col">N° de Defectos</th>
+                                <th scope="col">Peso de Imperfecciones (gr)</th>
+                                <th scope="col">% de Imperfecciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="NGRT" id="NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Negro Total</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRT" id="E_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRT" id="D_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRT" id="P_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRT" id="POR_NGRT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="AGT" id="AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Agrio Total</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AGT" id="E_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AGT" id="D_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AGT" id="P_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AGT" id="POR_AGT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="VC" id="VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Vaina/Cereza</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_VC" id="E_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_VC" id="D_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_VC" id="P_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_VC" id="POR_VC_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row" tabindex="1" data-mdb-container="body" data-mdb-placement="left" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, si existen piedras deberá rechazarse la muestra">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRGR" id="PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Piedras Grandes</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRGR" id="E_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRGR" id="D_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRGR" id="P_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRGR" id="POR_PDRGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row" tabindex="1" data-mdb-container="body" data-mdb-placement="left" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, si existen piedras deberá rechazarse la muestra">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PDRMD" id="PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Piedras Medianas</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRMD" id="E_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRMD" id="D_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRMD" id="P_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRMD" id="POR_PDRMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLGR" id="PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Palos Grandes</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLGR" id="E_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLGR" id="D_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLGR" id="P_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLGR" id="POR_PLGR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost1" type="checkbox" value="PLMD" id="PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Palos Medianos</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLMD" id="E_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLMD" id="D_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLMD" id="P_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLMD" id="POR_PLMD_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              
+                              
+                            </tbody>
+                          </table>
+                          
+                      </div>
+                      <div class="tab-pane fade table-responsive" id="defecto2-{{m.idMuestra}}" role="tabpanel" aria-labelledby="defectos2-{{m.idMuestra}}">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Defecto</th>
+                                <th scope="col">Encontrados</th>
+                                <th scope="col">N° de Defectos</th>
+                                <th scope="col">Peso de Imperfecciones (gr)</th>
+                                <th scope="col">% de Imperfecciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PRG" id="PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Pergamino</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PRG" id="E_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PRG" id="D_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0"> 
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PRG" id="P_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PRG" id="POR_PRG_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CSCR" id="CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Cascara</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CSCR" id="E_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CSCR" id="D_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CSCR" id="P_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CSCR" id="POR_CSCR_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="RTAT" id="RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Roto/Astillado</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_RTAT" id="E_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_RTAT" id="D_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_RTAT" id="P_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_RTAT" id="POR_RTAT_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPI" id="DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Daños por insectos</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPI" id="E_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPI" id="D_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPI" id="P_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPI" id="POR_DPI_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="NGRP" id="NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Negro parcial</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_NGRP" id="E_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_NGRP" id="D_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_NGRP" id="P_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_NGRP" id="POR_NGRP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="AMGP" id="AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Amargo parcial</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_AMGP" id="E_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_AMGP" id="D_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_AMGP" id="P_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_AMGP" id="POR_AMGP_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="FL" id="FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Flotador</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_FL" id="E_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_FL" id="D_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_FL" id="P_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_FL" id="POR_FL_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="CNCH" id="CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Concha</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_CNCH" id="E_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_CNCH" id="D_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_CNCH" id="P_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_CNCH" id="POR_CNCH_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                              <tr>
+                                <td scope="row" tabindex="1" data-mdb-container="body" data-mdb-placement="left" data-mdb-toggle="popover" data-mdb-trigger="focus" title="Advertencia" data-mdb-content="Según las normas SCAA, si existen piedras deberá rechazarse la muestra">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PDRPQ" id="PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Piedras pequeñas</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PDRPQ" id="E_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PDRPQ" id="D_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PDRPQ" id="P_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PDRPQ" id="POR_PDRPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="PLPQ" id="PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Palos pequeños</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_PLPQ" id="E_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_PLPQ" id="D_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_PLPQ" id="P_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_PLPQ" id="POR_PLPQ_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                              <tr>
+                                <td scope="row">
+                                  <div class="form-check">
+                                    <input data-muestra="{{m.idMuestra}}" class="form-check-input defectost2" type="checkbox" value="DPA" id="DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}"/>
+                                  </div>
+                                </td>
+                                <td>Daños por agua</td>
+                                <td>
+                                  <input class="w-100 dEnc" type="number" data-muestra="{{m.idMuestra}}" name="E_DPA" id="E_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dDef" type="number" data-muestra="{{m.idMuestra}}" name="D_DPA" id="D_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPesos" max="500" type="number" data-muestra="{{m.idMuestra}}" name="P_DPA" id="P_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                <td>
+                                  <input class="w-100 dPorcentaje" type="number" data-muestra="{{m.idMuestra}}" name="POR_DPA" id="POR_DPA_{{m.idMuestra}}" form="addFisico_{{m.idMuestra}}" step="0.01" min="0" readonly value="0">
+                                </td>
+                                
+                              </tr>
+                            </tbody>
+                          </table>
+                          <div class="row px-0 justify-content-end align-items-end me-1">
+                            <div class="col-1 text-center px-0">
+                              <a id="save-{{m.idMuestra}}" href="javascript:void(0);" onclick="saveFisica(event,{{m.idMuestra}});" class="btn btn-success w-100 px-0" form="addFisico_{{m.idMuestra}}">
+                              <i class="fas fa-check fa-2xl"></i>
+                              </a>
+                            </div> 
+                        </div>  
+                      </div>
+                    </div>            
+                    <div class="row px-0 justify-content-end align-items-end">
+                      <div class="col-3 text-center doneButton px-0">
+                          <form onsubmit="saveFisica(event, {{m.idMuestra}})" id="addFisico_{{m.idMuestra}}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="idMuestra" value="{{m.idMuestra}}">
+                          </form>
+                      </div> 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+      {% endfor %}
+      </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load utilidades %}
+{% block head_css %}
+<link rel="stylesheet" href="{% static '/css/registro.css' %}">
+<link rel="stylesheet" href="{% static '/css/analisis.css' %}">
+<link rel="stylesheet" href="{% static '/css/profile.css' %}">
+<link rel="stylesheet" href="{% static '/css/orden.css' %}">
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'scripts/list.min.js' %}"></script>
+<script src="{% static 'scripts/usuarios.js' %}"></script>
+<script src="{% static 'scripts/signup.js' %}"></script>
+{% endblock %}
+
+
+{% block title %}
+    : Usuarios
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-3 w-75 rContenedor">
+        <!--Tabla de vista de inicio-->
+        <div class="row justify-content-center mb-3 align-items-center h-100 py-3">
+            <div class="col-6 text-start">
+                <div class="form-outline my-2 w-50">
+                    <input id="searching" class="search form-control"/>
+                    <label class="form-label" for="searching">Buscar</label>
+                  </div>
+            </div> 
+            {% if request.user|has_group:"Administrador" %}
+            <div class="col-6 text-end">
+                <button type="button" class="btn btn-dark" data-mdb-toggle="modal" data-mdb-target="#addUser">
+                    + Agregar Usuario
+                  </button>
+                  <div class="modal fade text-start" id="addUser" data-mdb-backdrop="static" tabindex="-1" aria-labelledby="addUserLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="addUserLabel">Agregar Usuario</h5>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addUserForm" onsubmit="addUser(event);" method="POST">
+                                {% csrf_token %}
+                                <label class="form-label text-black" for="name">Nombres:</label>
+                                <div class="input-group mb-4">
+                                    <input class="form-control" type="text" id="name" name="name" placeholder="Escribe tus nombres" value="" required autocomplete="off">
+                                </div>
+                                <label class="form-label text-black" for="lastname">Apellidos:</label>
+                                <div class="input-group mb-4">
+                                    <input class="form-control" type="text" id="lastname" name="lastname" placeholder="Escribe tus apellidos" value="" required autocomplete="off">
+                                </div>
+                                <label class="form-label text-black" for="email">Email</label>
+                                <div class="input-group mb-4">
+                                    <input class="form-control" type="email" id="email" name="email" placeholder="Escribe tu mail" value="" required autocomplete="off">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-black" for="org">Organización</label>
+                                    <select name="org" id="org" class="select" data-mdb-container="#addUser">
+                                        {% for o in organizaciones %}
+                                            <option value="{{o.id_org}}">{{o.name_org}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-black" for="roles">Roles</label>
+                                    <select name="roles" id="roles" class="select disable-toggle-all" multiple data-mdb-container="#addUser">
+                                        {% for r in roles %}
+                                            <option value="{{r.id}}">{{r.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <label class="form-label text-black" for="password">Contraseña </label>
+                                
+                                <div class="input-group mb-0" >
+                                    <input class="form-control" type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Escribe aqui tu contraseña" value="" required>
+                                    <span class="input-group-text">
+                                    <i class="fas fa-eye" id="togglePasswordP" 
+                                    style="cursor: pointer"></i>
+                                    </span>
+                                </div>
+                                <div class="form-helper" style="font-size: .75rem;">
+                                    <p>Debe contener minimo mayusculas, minusculas, numeros y signos (@,!,?)</p> 
+                                </div>
+                                <label class="form-label text-black" for="passwordC">Confirmación de Contraseña</label>
+                                <div class="input-group mb-4">
+                                    <input class="form-control" type="password" id="passwordC" name="passwordc" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Confirma tu contraseña " value="" required>
+                                    <span class="input-group-text">
+                                    <i class="fas fa-eye" id="togglePasswordPC" 
+                                    style="cursor: pointer"></i>
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="text-start">
+                                <button id="creation" class="btn btn-warning createbtn" type="submit" form="addUserForm"><strong>Crear Cuenta</strong></button>
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-dark" data-mdb-dismiss="modal">Cerrar</button>
+                            </div>
+                            
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            {% endif %}
+        </div>
+        <div id="table-list">
+            <table class="table table table-striped table-hover text-center" id="tblSearch">
+                <thead class="table-dark">
+                <tr id="tableHeader">
+                    <th scope="col" class="sort" data-sort="email">Email</th>
+                    <th scope="col" class="sort" data-sort="org">Organización</th>
+                    <th scope="col" class="sort" data-sort="est">Estado</th>
+                    <th scope="col">Detalles</th>
+                </tr>
+                </thead>
+                <tbody class="list">
+                    {% if usuarios %}
+                        {% for u in usuarios %}
+                        <tr class="align-middle">
+                            <td class="email">{{u.usuario.email}}</td>
+                            <td class="org"> {{u.org.name_org}}</td>
+                            <td id="estado-{{u.usuario.id}}" class="est">
+                                {% if u.usuario.is_active %}
+                                    Activo
+                                {% else %}
+                                    Inactivo
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!--Boton de DETALLES-->
+                                <a class="fa-solid fa-eye" style="color: #000000;" href="#verUsuario-{{u.usuario.id}}" role="button" data-mdb-toggle="modal">
+                                </a>    
+                                    <!-- Modal -->
+                                <div class="modal fade" id="verUsuario-{{u.usuario.id}}" data-mdb-backdrop="static" tabindex="-1" aria-labelledby="verUsuario-{{u.usuario.id}}-Label" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                                            <div class="modal-content text-start">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="verUsuario-{{u.usuario.id}}-Label">Perfil Publico</h5>
+                                                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="container-fluid">
+                                                        <div class="row justify-content-center mb-3">
+                                                            <div class="col-10">
+                                                                <h5>Nombre completo</h5>
+                                                                <hr class="separatorProfile"></hr>
+                                                                <p class="textInfo">{{u.usuario.first_name}} {{u.usuario.last_name}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="row justify-content-center mb-3">
+                                                            <div class="col-10">
+                                                                <h5>Dirección de correo electrónico</h5>
+                                                                <hr class="separatorProfile"></hr>
+                                                                <p class="textInfo">{{u.usuario.email}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="row justify-content-center mb-3">
+                                                            <div class="col-10">
+                                                                <h5>Organización</h5>
+                                                                <hr class="separatorProfile"></hr>
+                                                                <p class="textInfo">{{u.org.name_org}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="row justify-content-center mb-3">
+                                                            <div class="col-5">
+                                                                <h5>Ubicación</h5>
+                                                                <hr class="separatorProfile"></hr>
+                                                                <p class="textInfo">{{u.org.ubicacion.nameMun}}, {{u.org.ubicacion.fkdpto.nameDpto}}, {{u.org.ubicacion.fkdpto.fkPais.namePais}}</p>
+                                                            </div>
+                                                            <div class="col-5">
+                                                                <h5>Tipo de Usuario</h5>
+                                                                <hr class="separatorProfile"></hr>
+                                                                <p class="textInfo">
+                                                                    {% for g in u.usuario.groups.all %}
+                                                                        {% if forloop.first %}
+                                                                            {% if forloop.last == forloop.first %}
+                                                                                {{g.name}}.
+                                                                            {% else %}
+                                                                                {{g.name}},
+                                                                            {% endif %}
+                                                                        {% elif forloop.last %}   
+                                                                            {{g.name}}.
+                                                                        {% else %}
+                                                                        , {{g.name}},
+                                                                        {% endif %}
+                                                                    {% endfor %}
+
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <br>
+                                                        {% if request.user|has_group:"Administrador" %}
+                                                        <div class="row justify-content-center mb-3">
+                                                            <div class="col-10 ">
+                                                                <h5>Mas opciones...</h5>
+                                                                <hr class="separatorProfile"></hr>
+                                                                <a class="btn btn-warning" data-mdb-target="#editarUsuario-{{u.usuario.id}}" data-mdb-toggle="modal" data-mdb-dismiss="modal">Editar Usuario</a>
+                                                                {% if u.usuario.is_active %}
+                                                                    <button class="btn btn-danger" type="submit" form="deleteUser-{{u.usuario.id}}">Eliminar Usuario</button>
+                                                                {% else %}
+                                                                    <button class="btn bg-success" type="submit" form="activateUser-{{u.usuario.id}}">Activar Usuario</button>  
+                                                                {% endif %}
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <form id="deleteUser-{{u.usuario.id}}" onsubmit="deleteUser(event,{{u.usuario.id}});" method="POST">
+                                                            {% csrf_token %}
+                                                        </form>
+                                                        <form id="activateUser-{{u.usuario.id}}" onsubmit="activateUser(event, {{u.usuario.id}});" method="POST">
+                                                            {% csrf_token %}
+                                                        </form>
+                                                        {% endif %}
+
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button id="cerrarver-{{u.usuario.id}}" type="button" class="btn btn-dark" data-mdb-dismiss="modal">Cerrar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                                {% if request.user|has_group:"Administrador" %}
+                                <div class="modal fade" id="editarUsuario-{{u.usuario.id}}" data-mdb-backdrop="static" tabindex="-1" aria-labelledby="editarUsuario-{{u.usuario.id}}-Label" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                                    <div class="modal-content text-start">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="editarUsuario-{{u.usuario.id}}-Label">Editar Usuario</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="container-fluid">
+                                                <div class="row justify-content-center mb-3">
+                                                    <div class="col-10">
+                                                        <h5>Nombre completo</h5>
+                                                        <hr class="separatorProfile"></hr>
+                                                        <div class="row justify-content-center">
+                                                            <div class="col-6">
+                                                                <div class="form-outline">
+                                                                    <input form="editUsuario-{{u.usuario.id}}" type="text" id="names-{{u.usuario.id}}" name="names" class="form-control" value="{{u.usuario.first_name}}" required/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <div class="form-outline">
+                                                                    <input form="editUsuario-{{u.usuario.id}}" type="text" id="lastnames-{{u.usuario.id}}" name="lastnames" class="form-control" value="{{u.usuario.last_name}}" required/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <div class="row justify-content-center mb-3">
+                                                    <div class="col-10">
+                                                        <h5>Dirección de correo electrónico</h5>
+                                                        <hr class="separatorProfile"></hr>
+                                                        <div class="form-outline">
+                                                            <input form="editUsuario-{{u.usuario.id}}" type="email" id="email-{{u.usuario.id}}" class="form-control" value="{{u.usuario.email}}" name="email" required/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <div class="row justify-content-center mb-3">
+                                                    <div class="col-10">
+                                                        <h5>Organización</h5>
+                                                        <hr class="separatorProfile"></hr>
+                                                        <select form="editUsuario-{{u.usuario.id}}" name="org" id="org-{{u.usuario.id}}" class="select" data-mdb-container="#editarUsuario-{{u.usuario.id}}">
+                                                            {% for o in organizaciones %}
+                                                                <option value="{{o.id_org}}" {% if o == u.org %} selected {% endif %}>{{o.name_org}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row justify-content-center mb-3">
+                                                    <div class="col-10">
+                                                        <h5>Roles</h5>
+                                                        <hr class="separatorProfile"></hr>
+                                                        <select form="editUsuario-{{u.usuario.id}}" name="roles" id="roles-{{u.usuario.id}}" class="select disable-toggle-all" multiple data-mdb-container="#editarUsuario-{{u.usuario.id}}">
+                                                            {% for r in roles %}
+                                                                <option value="{{r.id}}" {% if r in u.usuario.groups.all %} selected {% endif %}>{{r.name}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-warning" type="submit" form="editUsuario-{{u.usuario.id}}">Guardar</button>  
+                                            <button id="cerrarEditar-{{u.usuario.id}}" type="button" class="btn btn-dark" data-mdb-target="#verUsuario-{{u.usuario.id}}" data-mdb-toggle="modal" data-mdb-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <form id="editUsuario-{{u.usuario.id}}" onsubmit="editUser(event, {{u.usuario.id}});" method="post">
+                                        {% csrf_token %}
+                                    </form>
+                                </div>
+                                {% endif %}    
+                            </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}

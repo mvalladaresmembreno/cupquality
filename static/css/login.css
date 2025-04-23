@@ -1,0 +1,23 @@
+
+#togglePassword, #togglePasswordP, #togglePasswordPC{
+    color: #FFC800;
+  }
+
+.card{
+    border-radius: 1rem;
+}
+.signinbtn{
+    background-color: #FFC800;
+}
+.signinbtn:hover
+{
+    background-color:rgba(255, 204, 0, 0.75);
+}
+
+#resetpwd, #resetpwd:visited{
+    color: #000;
+}
+#resetpwd:hover, #resetpwd:focus{
+    color: #FFC800;
+}
+

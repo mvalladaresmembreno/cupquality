@@ -1,0 +1,112 @@
+:root {
+    --prm-color: #FFC800;
+    --prm-gray: #b1b1b1;
+}
+/* CSS */
+.steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.step-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--prm-gray);
+    transition: .4s;
+}
+
+.step-button[aria-expanded="true"] {
+    width: 60px;
+    height: 60px;
+    background-color: var(--prm-color);
+    color: #fff;
+}
+
+.done {
+    background-color: var(--prm-color);
+    color: #fff;
+}
+
+.step-item {
+    z-index: 10;
+    text-align: center;
+}
+
+.buttonProcesos
+{
+    width: 3.125rem;
+    height: 3.125rem;
+    filter: invert(69%) sepia(9%) saturate(0%) hue-rotate(169deg) brightness(93%) contrast(100%);
+    
+}
+
+.procesos{
+    display: none;
+}
+.change-color
+{
+    filter: invert(0%) sepia(90%) saturate(7429%) hue-rotate(243deg) brightness(84%) contrast(100%);
+}
+    
+
+#progress {
+  -webkit-appearance:none;
+    position: absolute;
+    width: calc(100% - 75px);
+    z-index: 5;
+    height: 10px;
+    margin-left: 2rem;
+    margin-bottom: 1px;
+}
+
+/* to customize progress bar */
+#progress::-webkit-progress-value {
+    background-color: var(--prm-color);
+    transition: .5s ease;
+}
+
+#progress::-webkit-progress-bar {
+    background-color: var(--prm-gray);
+
+}
+.separator-form{
+    background: linear-gradient(0.25turn, #FFC800, #ffffff);
+}
+.btn {
+    text-transform: unset !important;
+  }
+.rContenedor{
+    padding-bottom: 6rem;
+}
+
+.form-check-input[type="checkbox"]:checked, .form-check-input[type="radio"]:checked::after
+{
+    background-color: #FFC800;
+}
+.form-check-input[type="checkbox"]:checked{
+    background-image: none;
+}
+.form-check-input[type="checkbox"]:checked:focus{
+    background-color: #FFC800;
+    border-color: #FFC800;
+}
+.form-check-input, .form-check-input:focus, .form-check-input:checked{
+    border-color: #FFC800;
+}
+/*REGLAS DE REPARACION*/
+.bg-dark{
+    background-color: #262626 !important;
+}
+.loggedoutnav{
+    font-family: Roboto, sans-serif;
+    font-size: 1.75rem;
+    color: #FFC800;
+}
+.mb-4{
+    margin-bottom: 2rem !important;
+}
