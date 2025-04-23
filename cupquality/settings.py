@@ -7,15 +7,16 @@ import os
 import sys
 import environ
 
+# Paths
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Load environment
 root = environ.Path(start=__file__) - 2
 env = environ.Env()
-env.read_env()
-print("DEBUG EMAIL_HOST =", env('EMAIL_HOST'))
+env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 
-# Paths
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-0-kxmv*tk2at8sb4u_7!y#t+d4i^oy+6c$k*nl(o@_2g5y5yle'
@@ -126,20 +127,19 @@ STATIC_URL = '/static/'
 # Default PK
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email settings
-# Email settings
+#email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 60
 
-if env('EMAIL_HOST', default=None):
+try:
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_PORT = env.int('EMAIL_PORT')
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
     DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-else:
-    print("⚠️ Variables de correo no definidas. Se omite configuración de email.")
+except Exception as e:
+    print("⚠️ No se cargaron las variables de correo:", e)
 
 
 # Admins
