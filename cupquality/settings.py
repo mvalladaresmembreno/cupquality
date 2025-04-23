@@ -11,6 +11,8 @@ import environ
 root = environ.Path(start=__file__) - 2
 env = environ.Env()
 env.read_env()
+print("DEBUG EMAIL_HOST =", env('EMAIL_HOST'))
+
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -125,17 +127,20 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
+# Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 60
-try:
+
+if env('EMAIL_HOST', default=None):
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_PORT = env.int('EMAIL_PORT')
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
     DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-except Exception as e:
-    raise Exception(f"❌ Falta una variable de entorno para configurar el correo: {e}")
+else:
+    print("⚠️ Variables de correo no definidas. Se omite configuración de email.")
+
 
 # Admins
 ADMINS = [
