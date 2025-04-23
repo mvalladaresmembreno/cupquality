@@ -103,7 +103,14 @@ WSGI_APPLICATION = 'cupquality.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db('DB_URI')
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'cupquality_db',
+        'USER': 'mvalladares',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 
 
